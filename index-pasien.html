@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Pasien - Rumah Sakit Islam Banjarmasin</title> <link rel="stylesheet" href="style/style-pasien.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        /* Beberapa styling dasar untuk pesan error, bisa dipindahkan ke style-pasien.css */
+        .loading-message, .error-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            color: #555;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+        /* Style untuk status Aktif/Nonaktif jika diperlukan */
+        .status.aktif {
+            color: green;
+            font-weight: bold;
+        }
+        .status.nonaktif {
+            color: orange;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <img src="image/logo.svg" alt="Logo RS">
+            <span class="logo_name">
+                <h5>RUMAH SAKIT ISLAM<br>BANJARMASIN</h5>
+            </span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="index.html">
+                    <img src="image/beranda.svg" alt="Beranda">
+                    <span class="link_name">Beranda</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index.html" class="link_name">Beranda</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-pendaftaran.html">
+                        <img src="image/kunjungan.svg" alt="Kunjungan">
+                        <span class="link_name">Pendaftaran</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Pendaftaran</a></li>
+                    <li><a href="index-pendaftaran.html">Pendaftaran Hari Ini</a></li>
+                    <li><a href="index-pendaftaran-riwayat.html">Riwayat Pendaftaran</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="index-pasien.html">
+                    <img src="image/pasien.svg" alt="Pasien">
+                    <span class="link_name">Pasien</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index-pasien.html" class="link_name">Pasien</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-layanan.html">
+                        <img src="image/kunjungan.svg" alt="Layanan">
+                        <span class="link_name">Layanan</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Layanan</a></li>
+                    <li><a href="index-layanan.html">Poli</a></li>
+                    <li><a href="index-layanan_dokter.html">Dokter</a></li>
+                    <li><a href="index-layanan_perawat.html">Perawat</a></li>
+                </ul>
+            </li>
+            <li class="logout">
+                <a href="#" id="logoutButton" class="keluar"> <img src="image/keluar.svg" alt="Keluar">
+                    <span class="link_name">Keluar</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="#" class="link_name">Keluar</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <section class="home-section">
+        <div class="home-content">
+            <i class="bx bx-menu"></i>
+            <div class="profile-trigger" onclick="toggleProfilePopup()">
+                <img src="image/admin.svg" alt="User" class="profile-icon">
+            </div>
+
+            <div id="profile-popup" class="profile-popup hidden">
+                <div class="popup-content">
+                    <img src="image/admin.svg" alt="User" class="popup-icon">
+                    <div>
+                        <div class="popup-name" id="userNameDisplay">Memuat...</div>
+                        <div class="popup-role" id="userRoleDisplay">Memuat...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <main>
+        <div class="main-content">
+            <h3>Data Pasien</h3>
+            <a href="index-pasien_tambah.html" class="add-btn">
+                Tambah <i class="bx bxs-plus-circle"></i>
+            </a>
+        </div>
+        <div class="card">
+            <div class="top-bar">
+                <div class="search-group">
+                    <input type="text" id="searchInput" placeholder="Cari Berdasarkan Nama Pasien" />
+                    <button class="search-btn" id="searchButton"><i class="bx bx-search"></i></button>
+                </div>
+                <button class="filter-btn"><img src="image/Input.svg" alt=""></button>
+            </div>
+            <div id="loadingMessage" class="loading-message">Memuat data pasien...</div>
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Rekam Medis</th>
+                        <th>NIK</th>
+                        <th>Nama Pasien</th>
+                        <th>Tanggal Lahir</th>
+                        <th>Agama</th>
+                        <th>Kabupaten</th>
+                        <th>Pekerjaan</th>
+                        <th>Jenis Kelamin</th>
+                        <th>Alamat</th>
+                        <th>No Hp</th>
+                        <th>Email</th>
+                        <th>Golongan Darah</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="pasienTableBody">
+                </tbody>
+            </table>
+            <div class="pagination-wrapper">
+                <div class="pagination-center" id="paginationInfo">Halaman -/-</div>
+                </div>
+        </div>
+    </main>
+
+    <script>
+        const BASE_API_URL = 'http://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+
+        // --- Elemen HTML yang akan dimanipulasi ---
+        const pasienTableBody = document.getElementById('pasienTableBody');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const paginationInfo = document.getElementById('paginationInfo');
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userRoleDisplay = document.getElementById('userRoleDisplay');
+        const logoutButton = document.getElementById('logoutButton');
+
+        // --- Proteksi Halaman Dashboard ---
+        const authToken = localStorage.getItem('auth_token');
+        const userRole = localStorage.getItem('user_role');
+        const userName = localStorage.getItem('user_name');
+
+        if (!authToken) {
+            alert('Anda harus login terlebih dahulu.');
+            window.location.href = 'login.html';
+        }
+
+        // --- Tampilkan Nama & Role User di header popup ---
+        userNameDisplay.textContent = userName || 'User';
+        userRoleDisplay.textContent = userRole || 'N/A';
+
+        // --- Fungsionalitas Logout ---
+        logoutButton.addEventListener('click', async (event) => {
+            event.preventDefault(); // Mencegah navigasi default
+
+            if (!confirm('Apakah Anda yakin ingin keluar?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Logout Sukses');
+                } else {
+                    const errorData = await response.json();
+                    console.error('Logout Gagal:', errorData.message || response.statusText);
+                }
+
+                // Hapus token dan role dari localStorage, terlepas dari respons backend
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+
+                // Arahkan kembali ke halaman login
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                console.error('Error saat logout:', error);
+                alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // --- Fungsi untuk Mengambil dan Menampilkan Data Pasien ---
+        async function fetchPasienData() {
+            loadingMessage.style.display = 'block'; // Tampilkan pesan loading
+            errorMessage.style.display = 'none'; // Sembunyikan pesan error
+            pasienTableBody.innerHTML = ''; // Kosongkan tabel sebelum memuat data baru
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/pasiens`, { // Endpoint API Pasien
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}` // Kirim token untuk otorisasi
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || `Gagal mengambil data pasien: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const pasiens = result.data; // Data pasien ada di dalam properti 'data' karena PasienResource::collection
+
+                loadingMessage.style.display = 'none'; // Sembunyikan pesan loading
+
+                if (pasiens.length === 0) {
+                    pasienTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Tidak ada data pasien.</td></tr>';
+                    paginationInfo.textContent = 'Halaman 0/0';
+                    return;
+                }
+
+                pasiens.forEach((pasien, index) => {
+                    const row = document.createElement('tr');
+                    // Perhatikan bahwa nama properti (pasien.rm, pasien.nama_pasien, dll.)
+                    // harus sesuai dengan nama kolom di resource PasienResource Anda.
+                    // Jika Anda memiliki mutator di model atau resource, sesuaikan.
+                    // Contoh: tgl_lahir di database mungkin perlu diformat.
+                    const formattedTglLahir = new Date(pasien.tgl_lahir).toLocaleDateString('id-ID', {
+                        day: '2-digit', month: '2-digit', year: 'numeric'
+                    });
+                    const statusPasien = pasien.status || 'Aktif'; // Asumsi ada kolom status, default 'Aktif'
+                    const statusClass = statusPasien === 'Aktif' ? 'aktif' : 'nonaktif';
+
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${pasien.rm}</td>
+                        <td>${pasien.nik}</td>
+                        <td>${pasien.nama_pasien}</td>
+                        <td>${formattedTglLahir}</td>
+                        <td>${pasien.agama}</td>
+                        <td>${pasien.kabupaten || '-'}</td>
+                        <td>${pasien.pekerjaan || '-'}</td>
+                        <td>${pasien.jns_kelamin}</td>
+                        <td>${pasien.alamat}</td>
+                        <td>${pasien.no_hp_pasien}</td>
+                        <td>${pasien.email_pasien || '-'}</td>
+                        <td>${pasien.gol_darah || '-'}</td>
+                        <td>
+                            <a href="index-pasien_detail.html?rm=${pasien.rm}"><img src="image/eye.svg" alt="Detail" class="aksi"></a>                            
+                            </td>
+                    `;
+                    pasienTableBody.appendChild(row);
+                });
+
+                paginationInfo.textContent = `Halaman 1/1`; // Karena belum ada pagination API
+
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                errorMessage.style.display = 'block';                
+                errorMessage.textContent = 'Gagal memuat data pasien: ' + error.message;
+                console.error('Error fetching pasien data:', error);
+                // Jika error adalah karena autentikasi, arahkan ke login
+                if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // --- Panggil fungsi untuk mengambil data saat halaman dimuat ---
+        document.addEventListener('DOMContentLoaded', fetchPasienData);
+        // --- Fungsionalitas Pencarian Pasien ---
+        searchButton.addEventListener('click', async () => {
+            const query = searchInput.value.trim();
+            if (!query) {
+                fetchPasienData();
+                return;
+            }
+
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            pasienTableBody.innerHTML = '';
+
+            try {
+                const url = new URL(`${BASE_API_URL}/pasiens`);
+                url.searchParams.append('search', query);
+
+                const response = await fetch(url.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || `Gagal memuat data pasien: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                // Filter berdasarkan nama_pasien, rm, atau nik (case-insensitive)
+                const filtered = (result.data || []).filter(item =>
+                    (item.nama_pasien && String(item.nama_pasien).toLowerCase().includes(query.toLowerCase())) ||
+                    (typeof item.rm === 'string' && item.rm.toLowerCase().includes(query.toLowerCase())) ||
+                    (typeof item.rm === 'number' && item.rm.toString().toLowerCase().includes(query.toLowerCase())) ||
+                    (item.nik && String(item.nik).toLowerCase().includes(query.toLowerCase()))
+                );
+
+                loadingMessage.style.display = 'none';
+
+                if (filtered.length === 0) {
+                    pasienTableBody.innerHTML = `<tr><td colspan="14" style="text-align: center;">Data Pasien "${query}" tidak ditemukan.</td></tr>`;
+                    paginationInfo.textContent = 'Halaman 1/1';
+                    return;
+                }
+
+                filtered.forEach((pasien, index) => {
+                    const formattedTglLahir = new Date(pasien.tgl_lahir).toLocaleDateString('id-ID', {
+                        day: '2-digit', month: '2-digit', year: 'numeric'
+                    });
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${pasien.rm}</td>
+                        <td>${pasien.nik}</td>
+                        <td>${pasien.nama_pasien}</td>
+                        <td>${formattedTglLahir}</td>
+                        <td>${pasien.agama}</td>
+                        <td>${pasien.kabupaten || '-'}</td>
+                        <td>${pasien.pekerjaan || '-'}</td>
+                        <td>${pasien.jns_kelamin}</td>
+                        <td>${pasien.alamat}</td>
+                        <td>${pasien.no_hp_pasien}</td>
+                        <td>${pasien.email_pasien || '-'}</td>
+                        <td>${pasien.gol_darah || '-'}</td>
+                        <td>
+                            <a href="index-pasien_detail.html?rm=${pasien.rm}"><img src="image/eye.svg" alt="Detail" class="aksi"></a>
+                        </td>
+                    `;
+                    pasienTableBody.appendChild(row);
+                });
+
+                paginationInfo.textContent = `Halaman 1/1`;
+
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Gagal memuat data pasien: ' + error.message;
+                if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                    window.location.href = 'login.html';
+                }
+            }
+        });
+
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                searchButton.click();
+            }
+        });
+
+        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
+        let arrow = document.querySelectorAll(".arrow");
+        for (var i = 0; i < arrow.length; i++) {
+            arrow[i].addEventListener("click", (e) => {
+                let arrowParent = e.target.parentElement.parentElement;
+                console.log(arrowParent);
+                arrowParent.classList.toggle("showMenu");
+            });
+        }
+
+        let sidebar = document.querySelector(".sidebar");
+        let sidebarBtn = document.querySelector(".bx-menu");
+        console.log(sidebarBtn);
+        sidebarBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
+        function toggleProfilePopup() {
+            const popup = document.getElementById("profile-popup");
+            popup.classList.toggle("hidden");
+        }
+
+        document.addEventListener("click", function (e) {
+            const trigger = document.querySelector(".profile-trigger");
+            const popup = document.getElementById("profile-popup");
+
+            if (!trigger.contains(e.target) && !popup.contains(e.target)) {
+                popup.classList.add("hidden");
+            }
+        });
+
+    </script>
+</body>
+
+</html>

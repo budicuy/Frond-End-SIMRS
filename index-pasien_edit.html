@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Pasien - Rumah Sakit Islam Banjarmasin</title>
+    <link rel="stylesheet" href="style/style-pasien_tambah.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        /* Styling untuk pesan loading/error/sukses */
+        .message-container {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            display: none; /* Default hidden */
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .message-container.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message-container.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <img src="image/logo.svg" alt="Logo RS">
+            <span class="logo_name">
+                <h5>RUMAH SAKIT ISLAM<br>BANJARMASIN</h5>
+            </span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="index.html">
+                    <img src="image/beranda.svg" alt="Beranda">
+                    <span class="link_name">Beranda</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index.html" class="link_name">Beranda</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-pendaftaran.html">
+                        <img src="image/kunjungan.svg" alt="Kunjungan">
+                        <span class="link_name">Pendaftaran</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Pendaftaran</a></li>
+                    <li><a href="index-pendaftaran.html">Pendaftaran Hari Ini</a></li>
+                    <li><a href="index-pendaftaran-riwayat.html">Riwayat Pendaftaran</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="index-pasien.html">
+                    <img src="image/pasien.svg" alt="Pasien">
+                    <span class="link_name">Pasien</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index-pasien.html" class="link_name">Pasien</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-layanan.html">
+                        <img src="image/kunjungan.svg" alt="Layanan">
+                        <span class="link_name">Layanan</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Layanan</a></li>
+                    <li><a href="index-layanan.html">Poli</a></li>
+                    <li><a href="index-layanan_dokter.html">Dokter</a></li>
+                    <li><a href="index-layanan_perawat.html">Perawat</a></li>
+                </ul>
+            </li>
+            <li class="logout">
+                <a href="#" id="logoutButton" class="keluar">
+                    <img src="image/keluar.svg" alt="Keluar">
+                    <span class="link_name">Keluar</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="#" class="link_name">Keluar</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <section class="home-section">
+        <div class="home-content">
+            <i class="bx bx-menu"></i>
+            <div class="profile-trigger" onclick="toggleProfilePopup()">
+                <img src="image/admin.svg" alt="User" class="profile-icon">
+            </div>
+
+            <div id="profile-popup" class="profile-popup hidden">
+                <div class="popup-content">
+                    <img src="image/admin.svg" alt="User" class="popup-icon">
+                    <div>
+                        <div class="popup-name" id="userNameDisplay">Memuat...</div>
+                        <div class="popup-role" id="userRoleDisplay">Memuat...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <main>
+        <div class="main-content">
+            <a href="index-pasien.html" class="sub">Data Pasien</a>
+            <i class="sub-1 bx bx-chevron-right"></i>
+            <a href="#" id="detailLink" class="sub">Detail</a>
+            <i class="bx bx-chevron-right"></i>
+            <a href="index-pasien_edit.html" class="sub-link">Edit</a>
+        </div>
+        <div class="card">
+            <h3>Edit Pasien</h3>
+            <div id="loadingMessage" class="info-message">Memuat data pasien...</div>
+            <div id="errorMessage" class="info-message error-message" style="display: none;"></div>
+            <div id="responseMessage" class="message-container" style="display: none;"></div>
+
+
+            <form action="#" id="editPasienForm" style="display: none;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="rm">Rekam Medis</label>
+                        <input type="text" id="rm" name="rm" disabled /> </div>
+                    <div class="form-group">
+                        <label for="nik">NIK</label>
+                        <input type="text" id="nik" name="nik" required pattern="[0-9]{16}" title="NIK harus 16 digit angka" maxlength="16">
+                        <div id="nikError" style="color:#d32f2f;font-size:13px;display:none;margin-top:4px;">NIK harus 16 digit angka</div>
+                    </div>
+                    <script>
+                        const nikInput = document.getElementById('nik');
+                        const nikError = document.getElementById('nikError');
+                        nikInput.addEventListener('input', function () {
+                            // Hanya angka
+                            this.value = this.value.replace(/\D/g, '');
+                            // Maksimal 16 digit
+                            if (this.value.length > 16) {
+                                this.value = this.value.slice(0, 16);
+                            }
+                            // Tampilkan pesan jika kurang dari 16 digit
+                            if (this.value.length > 0 && this.value.length < 16) {
+                                nikError.style.display = 'block';
+                            } else {
+                                nikError.style.display = 'none';
+                            }
+                        });
+                    </script>
+
+                    <div class="form-group">
+                        <label for="nama_pasien">Nama Pasien</label>
+                        <input type="text" id="nama_pasien" name="nama_pasien" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Kelamin</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="jns_kelamin" value="pria" id="jns_kelamin_pria" required> Laki-laki</label>
+                            <label><input type="radio" name="jns_kelamin" value="perempuan" id="jns_kelamin_perempuan"> Perempuan</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tgl_lahir">Tanggal Lahir</label>
+                        <input type="date" id="tgl_lahir" name="tgl_lahir" required max="">
+                    </div>
+                    <script>
+                        // Set max attribute to today for tgl_lahir
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const tglLahirInput = document.getElementById('tgl_lahir');
+                            const today = new Date();
+                            const yyyy = today.getFullYear();
+                            const mm = String(today.getMonth() + 1).padStart(2, '0');
+                            const dd = String(today.getDate()).padStart(2, '0');
+                            const maxDate = `${yyyy}-${mm}-${dd}`;
+                            tglLahirInput.setAttribute('max', maxDate);
+
+                            tglLahirInput.addEventListener('input', function () {
+                                if (this.value > maxDate) {
+                                    this.value = maxDate;
+                                }
+                            });
+                        });
+                    </script>                   
+                    <div class="form-group">
+                        <label for="kabupaten">Kabupaten</label>
+                        <select id="kabupaten" name="kabupaten" required>
+                            <option value="">-- Pilih Kabupaten --</option>
+                            <option value="1">Banjar</option>
+                            <option value="2">Barito Kuala</option>
+                            <option value="3">Tapin</option>
+                            <option value="4">Hulu Sungai Selatan</option>
+                            <option value="5">Hulu Sungai Tengah</option>
+                            <option value="6">Hulu Sungai Utara</option>
+                            <option value="7">Tabalong</option>
+                            <option value="8">Tanah Laut</option>
+                            <option value="9">Tanah Bumbu</option>
+                            <option value="10">Balangan</option>
+                            <option value="11">Kotabaru</option>
+                            <option value="12">Banjarmasin (Kota)</option>
+                            <option value="13">Banjarbaru (Kota)</option>
+                        </select>
+                    </div>                    
+                    <div class="form-group">
+                        <label for="agama">Agama</label>
+                        <select id="agama" name="agama" required>
+                            <option value="">-- Pilih --</option>
+                            <option value="1">Islam</option>
+                            <option value="2">Kristen</option>
+                            <option value="3">Katolik</option>
+                            <option value="4">Hindu</option>
+                            <option value="5">Buddha</option>
+                            <option value="6">Konghucu</option>
+                            <option value="7">Lainnya</option>
+                        </select>
+                    </div>                    
+                    <div class="form-group">
+                        <label for="pekerjaan">Pekerjaan</label>
+                        <input type="text" id="pekerjaan" name="pekerjaan" required />
+                    </div>                    
+                    <div class="form-group">
+                        <label for="no_hp_pasien">Nomor Hp</label>
+                        <input type="text" id="no_hp_pasien" name="no_hp_pasien" required pattern="[0-9]{9,13}" title="Nomor HP minimal 9 digit dan maksimal 13 digit angka" maxlength="13">
+                        <div id="noHpError" style="color:#d32f2f;font-size:13px;display:none;margin-top:4px;">Nomor HP harus 9-13 digit angka</div>
+                    </div>
+                    <script>
+                        const noHpInput = document.getElementById('no_hp_pasien');
+                        const noHpError = document.getElementById('noHpError');
+                        noHpInput.addEventListener('input', function () {
+                            // Hanya angka
+                            this.value = this.value.replace(/\D/g, '');
+                            // Maksimal 13 digit
+                            if (this.value.length > 13) {
+                                this.value = this.value.slice(0, 13);
+                            }
+                            if (this.value.length > 0 && (this.value.length < 9 || this.value.length > 13)) {
+                                noHpError.style.display = 'block';
+                            } else {
+                                noHpError.style.display = 'none';
+                            }
+                        });
+                    </script>
+                    <div class="form-group">
+                        <label for="email_pasien">Email</label>
+                        <input type="email" id="email_pasien" name="email_pasien" required>
+                        <div id="emailError" style="color:#d32f2f;font-size:13px;display:none;margin-top:4px;">Masukkan email dengan benar</div>
+                    </div>
+                    <script>
+                        const emailInput = document.getElementById('email_pasien');
+                        const emailError = document.getElementById('emailError');
+                        emailInput.addEventListener('input', function () {
+                            // Simple email regex validation
+                            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (this.value.length > 0 && !emailPattern.test(this.value)) {
+                                emailError.style.display = 'block';
+                            } else {
+                                emailError.style.display = 'none';
+                            }
+                        });
+                    </script>
+
+                    <div class="form-group">
+                        <label for="gol_darah">Golongan Darah</label>
+                        <select id="gol_darah" name="gol_darah" required>
+                            <option value="">-- Pilih --</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="AB">AB</option>
+                            <option value="O">O</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="alamat">Alamat</label>
+                        <textarea id="alamat" name="alamat" rows="2" required></textarea>
+                    </div>
+
+                    <div class="form-actions full-width">
+                        <a href="#" id="kembaliButton" class="btn-1 btn-secondary">Kembali</a>
+                        <button type="submit" class="btn btn-primary" id="submitButton">Simpan Perubahan</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div id="popupSuccess" class="popup">
+            <div class="popup-tambah">
+                <div class="checkmark"><img src="image/centang.svg" alt=""></div>
+                <h3>Sukses</h3>
+                <p>Data pasien berhasil diupdate</p>
+            </div>
+        </div>
+    </main>
+
+
+    <script>
+        const BASE_API_URL = 'http://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+
+        // --- Elemen HTML yang akan dimanipulasi ---
+        const loadingMessage = document.getElementById('loadingMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const responseMessage = document.getElementById('responseMessage'); // Untuk pesan sukses/error submit
+        const editPasienForm = document.getElementById('editPasienForm');
+        const submitButton = document.getElementById('submitButton');
+        const popupSuccess = document.getElementById('popupSuccess');
+
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userRoleDisplay = document.getElementById('userRoleDisplay');
+        const logoutButton = document.getElementById('logoutButton');
+        const detailLink = document.getElementById('detailLink'); // Link kembali ke detail
+
+        // Input fields
+        const inputRm = document.getElementById('rm');
+        const inputNik = document.getElementById('nik');
+        const inputNamaPasien = document.getElementById('nama_pasien');
+        const inputJnsKelaminPria = document.getElementById('jns_kelamin_pria');
+        const inputJnsKelaminPerempuan = document.getElementById('jns_kelamin_perempuan');
+        const inputTglLahir = document.getElementById('tgl_lahir');
+        const inputAlamat = document.getElementById('alamat');
+        const inputNoHpPasien = document.getElementById('no_hp_pasien');
+        const inputEmailPasien = document.getElementById('email_pasien');
+        const inputGolDarah = document.getElementById('gol_darah');
+
+        let currentRm = null; // Variabel untuk menyimpan RM pasien yang sedang diedit
+
+        // --- Proteksi Halaman & Data User ---
+        const authToken = localStorage.getItem('auth_token');
+        const userRole = localStorage.getItem('user_role');
+        const userName = localStorage.getItem('user_name');
+
+        if (!authToken) {
+            alert('Anda harus login terlebih dahulu.');
+            window.location.href = 'login.html';
+        }
+
+        userNameDisplay.textContent = userName || 'User';
+        userRoleDisplay.textContent = userRole || 'N/A';
+
+        // --- Fungsionalitas Logout ---
+        logoutButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            if (!confirm('Apakah Anda yakin ingin keluar?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Logout Sukses');
+                } else {
+                    const errorData = await response.json();
+                    console.error('Logout Gagal:', errorData.message || response.statusText);
+                }
+
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                console.error('Error saat logout:', error);
+                alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // --- Fungsi untuk mendapatkan parameter dari URL ---
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // --- Fungsi untuk Menampilkan Pesan Feedback (Sukses/Error) ---
+        function showFeedbackMessage(message, type) {
+            responseMessage.innerHTML = message; // Use innerHTML to support <br>
+            responseMessage.className = `message-container ${type}`;
+            responseMessage.style.display = 'block';
+            setTimeout(() => {
+                responseMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // --- Fungsi untuk Menampilkan Popup Sukses ---
+        function showSuccessPopup() {
+            popupSuccess.style.display = 'flex';
+            setTimeout(() => {
+                popupSuccess.style.display = 'none';
+                window.location.href = `index-pasien_detail.html?rm=${currentRm}`; // Kembali ke detail setelah edit
+            }, 2000);
+        }
+
+
+        // --- Fungsi untuk Mengambil dan Mengisi Data Pasien ke Form ---
+        async function loadPasienData() {
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            editPasienForm.style.display = 'none'; // Sembunyikan form sampai data siap
+
+            currentRm = getUrlParameter('rm'); // Ambil RM dari URL
+
+            // Atur link 'Kembali' dan 'Detail'
+            document.getElementById('kembaliButton').href = `index-pasien_detail.html?rm=${currentRm}`;
+            detailLink.href = `index-pasien_detail.html?rm=${currentRm}`;
+
+
+            if (!currentRm) {
+                errorMessage.textContent = 'Nomor Rekam Medis (RM) tidak ditemukan di URL untuk diedit.';
+                errorMessage.style.display = 'block';
+                loadingMessage.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/pasiens/${currentRm}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error(`Pasien dengan RM ${currentRm} tidak ditemukan.`);
+                    }
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || `Gagal mengambil data pasien: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const pasien = result.data;
+
+                loadingMessage.style.display = 'none';
+                editPasienForm.style.display = 'grid'; // Tampilkan form
+                // Mengisi input fields dengan data yang diambil
+                inputRm.value = pasien.rm; // RM tetap disabled
+                inputNik.value = pasien.nik;
+                inputNamaPasien.value = pasien.nama_pasien;
+
+                // Menentukan radio button jenis kelamin
+                if (pasien.jns_kelamin === 'pria') {
+                    inputJnsKelaminPria.checked = true;
+                } else if (pasien.jns_kelamin === 'perempuan') {
+                    inputJnsKelaminPerempuan.checked = true;
+                }
+
+                // Format tanggal lahir untuk input type="date" (YYYY-MM-DD)
+                inputTglLahir.value = pasien.tgl_lahir; // Asumsi tgl_lahir dari API sudah YYYY-MM-DD
+
+                // Mengisi Kabupaten, Agama, dan Pekerjaan
+                // Pastikan elemen select sudah ada di DOM
+                const inputKabupaten = document.getElementById('kabupaten');
+                const inputAgama = document.getElementById('agama');
+                const inputPekerjaan = document.getElementById('pekerjaan');
+
+                // Jika backend mengirimkan ID kabupaten/agama, pastikan value-nya cocok dengan <option>
+                inputKabupaten.value = pasien.kabupaten || '';
+                inputAgama.value = pasien.agama || '';
+                // Jika pekerjaan berupa string, langsung isi
+                inputPekerjaan.value = pasien.pekerjaan || '';
+
+                inputAlamat.value = pasien.alamat;
+                inputNoHpPasien.value = pasien.no_hp_pasien;
+                inputEmailPasien.value = pasien.email_pasien;
+
+                // Set nilai untuk select golongan darah
+                inputGolDarah.value = pasien.gol_darah;
+
+
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Gagal memuat data pasien: ' + error.message;
+                console.error('Error fetching pasien data for edit:', error);
+                if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // --- Penanganan Submit Form Edit Pasien ---
+        editPasienForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Menyimpan Perubahan...';
+            responseMessage.style.display = 'none'; // Sembunyikan pesan sebelumnya
+
+            const formData = new FormData(editPasienForm);
+            const data = {};
+            formData.forEach((value, key) => {
+                // Jangan kirim RM dari form karena diambil dari URL
+                if (key !== 'rm') { 
+                    data[key] = value;
+                }
+            });
+
+            // Pastikan jns_kelamin yang terpilih terambil dengan benar
+            const selectedJnsKelamin = document.querySelector('input[name="jns_kelamin"]:checked');
+            if (selectedJnsKelamin) {
+                data['jns_kelamin'] = selectedJnsKelamin.value;
+            } else {
+                // Fallback jika tidak ada yang terpilih, atau tambahkan validasi
+                data['jns_kelamin'] = ''; 
+            }
+
+            // Hapus 'tempat_lahir' jika ada di form tapi tidak di DB schema Anda
+            if (data.hasOwnProperty('tempat_lahir')) {
+                delete data['tempat_lahir'];
+            }
+            
+            console.log('Data yang akan dikirim untuk update:', data);
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/pasiens/${currentRm}`, { // Endpoint PUT/PATCH
+                    method: 'PUT', // Menggunakan PUT untuk update keseluruhan resource
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Pasien berhasil diupdate:', result);
+                    showSuccessPopup(); // Tampilkan popup sukses dan redirect
+                } else {
+                    const errorDetails = await response.json();
+                    let errorMessageText = 'Gagal memperbarui data pasien.';
+                    if (errorDetails.message) {
+                        errorMessageText = errorDetails.message;
+                    }
+                    if (errorDetails.errors) {
+                        for (const key in errorDetails.errors) {
+                            errorMessageText += `<br>- ${errorDetails.errors[key].join(', ')}`;
+                        }
+                    }
+                    showFeedbackMessage(errorMessageText, 'error');
+                    console.error('Error Response:', errorDetails);
+                    if (errorMessageText.includes('Unauthenticated') || errorMessageText.includes('token')) {
+                        localStorage.removeItem('auth_token');
+                        localStorage.removeItem('user_role');
+                        localStorage.removeItem('user_name');
+                        alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                        window.location.href = 'login.html';
+                    }
+                }
+            } catch (error) {
+                console.error('Error saat mengirim data update pasien:', error);
+                showFeedbackMessage('Terjadi kesalahan jaringan atau server saat menyimpan.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Simpan Perubahan';
+            }
+        });
+
+
+        // Panggil fungsi untuk mengambil data saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', loadPasienData);
+
+
+        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
+        let arrow = document.querySelectorAll(".arrow");
+        for (var i = 0; i < arrow.length; i++) {
+            arrow[i].addEventListener("click", (e) => {
+                let arrowParent = e.target.parentElement.parentElement;
+                console.log(arrowParent);
+                arrowParent.classList.toggle("showMenu");
+            });
+        }
+
+        let sidebar = document.querySelector(".sidebar");
+        let sidebarBtn = document.querySelector(".bx-menu");
+        console.log(sidebarBtn);
+        sidebarBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
+        function toggleProfilePopup() {
+            const popup = document.getElementById("profile-popup");
+            popup.classList.toggle("hidden");
+        }
+
+        document.addEventListener("click", function (e) {
+            const trigger = document.querySelector(".profile-trigger");
+            const popup = document.getElementById("profile-popup");
+
+            if (!trigger.contains(e.target) && !popup.contains(e.target)) {
+                popup.classList.add("hidden");
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beranda</title>
+    <link rel="stylesheet" href="style/style.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        /* Beberapa styling dasar untuk loader dan pesan, bisa dipindahkan ke style.css */
+        .loading-text {
+            color: #666;
+            font-style: italic;
+        }
+        .error-text {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <img src="image/logo.svg" alt="Logo RS">
+            <span class="logo_name">
+                <h5>RUMAH SAKIT ISLAM<br>BANJARMASIN</h5>
+            </span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="index.html">
+                    <img src="image/beranda.svg" alt="Beranda">
+                    <span class="link_name">Beranda</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index.html" class="link_name">Beranda</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-pendaftaran.html">
+                        <img src="image/kunjungan.svg" alt="Kunjungan">
+                        <span class="link_name">Pendaftaran</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Pendaftaran</a></li>
+                    <li><a href="index-pendaftaran.html">Pendaftaran Hari Ini</a></li>
+                    <li><a href="index-pendaftaran-riwayat.html">Riwayat Pendaftaran</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="index-pasien.html">
+                    <img src="image/pasien.svg" alt="Pasien">
+                    <span class="link_name">Pasien</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index-pasien.html" class="link_name">Pasien</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-layanan.html">
+                        <img src="image/kunjungan.svg" alt="Layanan">
+                        <span class="link_name">Layanan</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Layanan</a></li>
+                    <li><a href="index-layanan.html">Poli</a></li>
+                    <li><a href="index-layanan_dokter.html">Dokter</a></li>
+                    <li><a href="index-layanan_perawat.html">Perawat</a></li>
+                </ul>
+            </li>
+
+            <li class="logout">
+                <a href="#" id="logoutButton" class="keluar">
+                    <img src="image/keluar.svg" alt="Keluar">
+                    <span class="link_name">Keluar</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="#" class="link_name">Keluar</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <section class="home-section">
+        <div class="home-content">
+            <i class="bx bx-menu"></i>
+            <div class="profile-trigger" onclick="toggleProfilePopup()">
+                <img src="image/admin.svg" alt="User" class="profile-icon">
+            </div>
+
+            <div id="profile-popup" class="profile-popup hidden">
+                <div class="popup-content">
+                    <img src="image/admin.svg" alt="User" class="popup-icon">
+                    <div>
+                        <div class="popup-name" id="userNameDisplay">Memuat...</div> <div class="popup-role" id="userRoleDisplay">Memuat...</div> </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <main>
+        <div class="main-content">
+            <h3>Beranda</h3>
+            <h4 id="welcomeMessage">Selamat Datang!</h4> </div>
+        <div class="cards">
+            <div class="card">
+                <div class="box">
+                    <h4 id="tanggal-hari-ini"></h4>
+                    <script>
+                        const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+                        const bulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                        const t = new Date();
+                        document.getElementById("tanggal-hari-ini").textContent =
+                            `Data Hari Ini : ${hari[t.getDay()]}, ${t.getDate()} ${bulan[t.getMonth()]} ${t.getFullYear()}`;
+                    </script>
+                </div>
+            </div>
+        </div>
+        <div class="cards-2">
+            <div class="card-2">
+                <div class="icon-case">
+                    <img src="image/icon-total-kunjungan.png" alt="icon-total-kunjungan">
+                </div>
+                <div class="box-2">
+                    <h4>Pendaftaran</h4>
+                    <h4 class="jumlah" id="pendaftaranCount">0</h4> </div>
+                <div class="arrow">
+                    <a href="index-pendaftaran.html"><img src="image/arrow-right.svg" alt=""></a>
+                </div>
+            </div>
+            <div class="card-2">
+                <div class="icon-case">
+                    <img src="image/icon-pasien.png" alt="icon-pasien">
+                </div>
+                <div class="box-2">
+                    <h4>Pasien</h4>
+                    <h4 class="jumlah" id="pasienCount">0</h4> </div>
+                <div class="arrow">
+                    <a href="index-pasien.html"><img src="image/arrow-right.svg" alt=""></a>
+                </div>
+            </div>
+            <div class="card-2">
+                <div class="icon-case">
+                    <img src="image/icon_poli.png" alt="icon_poli">
+                </div>
+                <div class="box-2">
+                    <h4>Poli</h4>
+                    <h4 class="jumlah" id="poliCount">0</h4> </div>
+                <div class="arrow">
+                    <a href="index-layanan.html"><img src="image/arrow-right.svg" alt=""></a>
+                </div>
+            </div>
+            <div class="card-2">
+                <div class="icon-case">
+                    <img src="image/icon_dokter.png" alt="icon_dokter">
+                </div>
+                <div class="box-2">
+                    <h4>Dokter</h4>
+                    <h4 class="jumlah" id="dokterCount">0</h4> </div>
+                <div class="arrow">
+                    <a href="index-layanan_dokter.html"><img src="image/arrow-right.svg" alt=""></a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const BASE_API_URL = 'http://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+
+        // --- Proteksi Halaman Dashboard ---
+        const authToken = localStorage.getItem('auth_token');
+        const userRole = localStorage.getItem('user_role');
+        const userName = localStorage.getItem('user_name'); // Ambil nama user
+
+        if (!authToken) {
+            // Jika tidak ada token, arahkan kembali ke halaman login
+            alert('Anda harus login terlebih dahulu.');
+            window.location.href = 'login.html';
+        }
+
+        // --- Tampilkan Nama & Role User ---
+        document.getElementById('userNameDisplay').textContent = userName || 'User'; // Tampilkan nama user
+        document.getElementById('userRoleDisplay').textContent = userRole || 'N/A'; // Tampilkan role user
+        document.getElementById('welcomeMessage').textContent = `Selamat Datang, ${userName}!`; // Perbarui pesan selamat datang
+
+        // --- Fungsionalitas Logout ---
+        const logoutButton = document.getElementById('logoutButton');
+        logoutButton.addEventListener('click', async (event) => {
+            event.preventDefault(); // Mencegah navigasi default
+
+            if (!confirm('Apakah Anda yakin ingin keluar?')) {
+                return; // Batalkan jika user tidak yakin
+            }
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}` // Kirim token untuk logout
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Logout Sukses');
+                } else {
+                    const errorData = await response.json();
+                    console.error('Logout Gagal:', errorData.message || response.statusText);
+                }
+
+                // Hapus token dan role dari localStorage, terlepas dari respons backend
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+
+                // Arahkan kembali ke halaman login
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                console.error('Error saat logout:', error);
+                alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
+                // Meskipun ada error, hapus token agar user bisa coba login ulang
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // --- Ambil Data Jumlah dari Backend ---
+        async function fetchDashboardCounts() {
+            // Tampilkan loading state
+            document.getElementById('pendaftaranCount').textContent = 'Memuat...';
+            document.getElementById('pasienCount').textContent = 'Memuat...';
+            document.getElementById('poliCount').textContent = 'Memuat...';
+            document.getElementById('dokterCount').textContent = 'Memuat...';
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/dashboard/counts`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}` // Kirim token untuk otorisasi
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `Gagal mengambil data dashboard: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('Data Dashboard Diterima:', data);
+
+                // Perbarui angka di HTML
+                document.getElementById('pendaftaranCount').textContent = data.pendaftaran_count || 0;
+                document.getElementById('pasienCount').textContent = data.pasien_count || 0;
+                document.getElementById('poliCount').textContent = data.poli_count || 0;
+                document.getElementById('dokterCount').textContent = data.dokter_count || 0;
+
+            } catch (error) {
+                console.error('Error mengambil data dashboard:', error);
+                // Tampilkan pesan error di tempat angka seharusnya
+                document.getElementById('pendaftaranCount').textContent = 'Error';
+                document.getElementById('pasienCount').textContent = 'Error';
+                document.getElementById('poliCount').textContent = 'Error';
+                document.getElementById('dokterCount').textContent = 'Error';
+                alert('Gagal memuat data dashboard: ' + error.message);
+                // Opsional: Redirect ke login jika token tidak valid/kadaluarsa
+                if (error.message.includes('Unauthenticated')) { // Sesuaikan pesan error dari Laravel
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // Panggil fungsi untuk mengambil data saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', fetchDashboardCounts);
+
+        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
+        let arrow = document.querySelectorAll(".arrow");
+        for (var i = 0; i < arrow.length; i++) {
+            arrow[i].addEventListener("click", (e) => {
+                let arrowParent = e.target.parentElement.parentElement;
+                console.log(arrowParent);
+                arrowParent.classList.toggle("showMenu");
+            });
+        }
+
+        let sidebar = document.querySelector(".sidebar");
+        let sidebarBtn = document.querySelector(".bx-menu");
+        console.log(sidebarBtn);
+        sidebarBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
+        function toggleProfilePopup() {
+            const popup = document.getElementById("profile-popup");
+            popup.classList.toggle("hidden");
+        }
+
+        document.addEventListener("click", function (e) {
+            const trigger = document.querySelector(".profile-trigger");
+            const popup = document.getElementById("profile-popup");
+
+            if (!trigger.contains(e.target) && !popup.contains(e.target)) {
+                popup.classList.add("hidden");
+            }
+        });
+    </script>
+</body>
+
+</html>

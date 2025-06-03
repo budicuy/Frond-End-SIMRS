@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Pasien - Rumah Sakit Islam Banjarmasin</title>
+    <link rel="stylesheet" href="style/style-pasien_tambah.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <style>
+        /* Styling untuk pesan loading/error */
+        .info-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Menambahkan styling untuk form group yang disabled agar terlihat seperti teks biasa */
+        .form-group input[disabled],
+        .form-group textarea[disabled] {
+            background-color: #f0f0f0; /* Warna latar belakang abu-abu */
+            border: 1px solid #ddd; /* Border yang sedikit lebih gelap */
+            cursor: default; /* Kursor default */
+            color: #333; /* Warna teks */
+            -webkit-opacity: 1; /* Override opacity for some browsers */
+            -moz-opacity: 1;
+            opacity: 1;
+        }
+
+        /* Adjust button styling if different from style-pasien_tambah.css */
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <img src="image/logo.svg" alt="Logo RS">
+            <span class="logo_name">
+                <h5>RUMAH SAKIT ISLAM<br>BANJARMASIN</h5>
+            </span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="index.html">
+                    <img src="image/beranda.svg" alt="Beranda">
+                    <span class="link_name">Beranda</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index.html" class="link_name">Beranda</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-pendaftaran.html">
+                        <img src="image/kunjungan.svg" alt="Kunjungan">
+                        <span class="link_name">Pendaftaran</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Pendaftaran</a></li>
+                    <li><a href="index-pendaftaran.html">Pendaftaran Hari Ini</a></li>
+                    <li><a href="index-pendaftaran-riwayat.html">Riwayat Pendaftaran</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="index-pasien.html">
+                    <img src="image/pasien.svg" alt="Pasien">
+                    <span class="link_name">Pasien</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index-pasien.html" class="link_name">Pasien</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-layanan.html">
+                        <img src="image/kunjungan.svg" alt="Layanan">
+                        <span class="link_name">Layanan</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Layanan</a></li>
+                    <li><a href="index-layanan.html">Poli</a></li>
+                    <li><a href="index-layanan_dokter.html">Dokter</a></li>
+                    <li><a href="index-layanan_perawat.html">Perawat</a></li>
+                </ul>
+            </li>
+            <li class="logout">
+                <a href="#" id="logoutButton" class="keluar">
+                    <img src="image/keluar.svg" alt="Keluar">
+                    <span class="link_name">Keluar</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="#" class="link_name">Keluar</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <section class="home-section">
+        <div class="home-content">
+            <i class="bx bx-menu"></i>
+            <div class="profile-trigger" onclick="toggleProfilePopup()">
+                <img src="image/admin.svg" alt="User" class="profile-icon">
+            </div>
+
+            <div id="profile-popup" class="profile-popup hidden">
+                <div class="popup-content">
+                    <img src="image/admin.svg" alt="User" class="popup-icon">
+                    <div>
+                        <div class="popup-name" id="userNameDisplay">Memuat...</div>
+                        <div class="popup-role" id="userRoleDisplay">Memuat...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <main>
+        <div class="main-content">
+            <a href="index-pasien.html" class="sub">Data Pasien</a>
+            <i class="bx bx-chevron-right"></i>
+            <a href="#" class="sub-link">Detail Pasien</a>
+        </div>
+        <div class="card">
+            <h3>Detail Pasien</h3>
+            <div id="loadingMessage" class="info-message">Memuat detail pasien...</div>
+            <div id="errorMessage" class="info-message error-message" style="display: none;"></div>
+
+            <form action="#" id="detailPasienForm" style="display: none;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Rekam Medis</label>
+                        <input type="text" id="rm" value="" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label>NIK</label>
+                        <input type="text" id="nik" value="" disabled>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama Pasien</label>
+                        <input type="text" id="nama_pasien" value="" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label>Jenis Kelamin</label>
+                        <input type="text" id="jns_kelamin" value="" disabled />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tanggal Lahir</label>
+                        <input type="text" id="tgl_lahir" value="" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label>Kabupaten</label>
+                        <input type="text" id="kabupaten" value="" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label>Agama</label>
+                        <input type="text" id="agama" value="" disabled />
+                    </div>                    
+                    <div class="form-group">
+                        <label>Pekerjaan</label>
+                        <input type="text" id="pekerjaan" value="" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor Hp</label>
+                        <input type="text" id="no_hp_pasien" value="" disabled />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email_pasien" value="" disabled />
+                    </div>
+                    <div class="form-group">
+                        <label>Golongan Darah</label>
+                        <input type="text" id="gol_darah" value="" disabled />
+                    </div>
+                    
+                    <div class="form-group full-width">
+                        <label>Alamat</label>
+                        <textarea id="alamat" disabled></textarea>
+                    </div>
+
+                    <div class="form-actions full-width">
+                        <a href="index-pasien.html" class="btn-1 btn-secondary">Kembali</a>
+                        <a href="#" id="editButton" class="btn-2 btn-primary">Edit</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+
+
+    <script>
+        const BASE_API_URL = 'http://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+
+        // --- Elemen HTML yang akan dimanipulasi ---
+        const loadingMessage = document.getElementById('loadingMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const detailPasienForm = document.getElementById('detailPasienForm'); // Kontainer form
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userRoleDisplay = document.getElementById('userRoleDisplay');
+        const logoutButton = document.getElementById('logoutButton');
+        const editButton = document.getElementById('editButton');
+
+        // Input fields
+        const inputRm = document.getElementById('rm');
+        const inputNik = document.getElementById('nik');
+        const inputNamaPasien = document.getElementById('nama_pasien');
+        const inputJnsKelamin = document.getElementById('jns_kelamin');
+        const inputTglLahir = document.getElementById('tgl_lahir');
+        const inputAlamat = document.getElementById('alamat');
+        const inputNoHpPasien = document.getElementById('no_hp_pasien');
+        const inputEmailPasien = document.getElementById('email_pasien');
+        const inputGolDarah = document.getElementById('gol_darah');
+        const inputStatus = document.getElementById('status'); // Asumsi ada kolom status
+
+
+        // --- Proteksi Halaman & Data User ---
+        const authToken = localStorage.getItem('auth_token');
+        const userRole = localStorage.getItem('user_role');
+        const userName = localStorage.getItem('user_name');
+
+        if (!authToken) {
+            alert('Anda harus login terlebih dahulu.');
+            window.location.href = 'login.html';
+        }
+
+        userNameDisplay.textContent = userName || 'User';
+        userRoleDisplay.textContent = userRole || 'N/A';
+
+        // --- Fungsionalitas Logout ---
+        logoutButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            if (!confirm('Apakah Anda yakin ingin keluar?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Logout Sukses');
+                } else {
+                    const errorData = await response.json();
+                    console.error('Logout Gagal:', errorData.message || response.statusText);
+                }
+
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                console.error('Error saat logout:', error);
+                alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // --- Fungsi untuk mendapatkan parameter dari URL ---
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // --- Fungsi untuk Mengambil dan Menampilkan Detail Pasien ---
+        async function fetchPasienDetail() {
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            detailPasienForm.style.display = 'none'; // Sembunyikan form sampai data siap
+
+            const rm = getUrlParameter('rm'); // Ambil RM dari URL
+
+            if (!rm) {
+                errorMessage.textContent = 'Nomor Rekam Medis (RM) tidak ditemukan di URL.';
+                errorMessage.style.display = 'block';
+                loadingMessage.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/pasiens/${rm}`, { // Endpoint API untuk detail pasien
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        throw new Error(`Pasien dengan RM ${rm} tidak ditemukan.`);
+                    }
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || `Gagal mengambil detail pasien: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const pasien = result.data; // Data pasien ada di dalam properti 'data' karena PasienResource
+
+                loadingMessage.style.display = 'none'; // Sembunyikan pesan loading
+                detailPasienForm.style.display = 'grid'; // Tampilkan form (ubah display ke grid sesuai CSS Anda)
+
+                // Mengisi elemen input dengan data pasien
+                inputRm.value = pasien.rm;
+                inputNik.value = pasien.nik;
+                inputNamaPasien.value = pasien.nama_pasien;
+                // Mapping kode kabupaten ke nama kabupaten
+                const kabupatenMap = {
+                    "1": "Banjar",
+                    "2": "Barito Kuala",
+                    "3": "Tapin",
+                    "4": "Hulu Sungai Selatan",
+                    "5": "Hulu Sungai Tengah",
+                    "6": "Hulu Sungai Utara",
+                    "7": "Tabalong",
+                    "8": "Tanah Laut",
+                    "9": "Tanah Bumbu",
+                    "10": "Balangan",
+                    "11": "Kotabaru",
+                    "12": "Banjarmasin (Kota)",
+                    "13": "Banjarbaru (Kota)"
+                };
+                const inputKabupaten = document.getElementById('kabupaten');
+                inputKabupaten.value = kabupatenMap[pasien.kabupaten] || 'N/A';
+                inputPekerjaan = document.getElementById('pekerjaan');
+                inputPekerjaan.value = pasien.pekerjaan || 'N/A'; // Asumsi ada kolom pekerjaan
+                // Ganti inputAgama menjadi select dan mapping kode agama ke nama agama
+                const inputAgama = document.getElementById('agama');
+                const agamaMap = {
+                    "1": "Islam",
+                    "2": "Kristen",
+                    "3": "Katolik",
+                    "4": "Hindu",
+                    "5": "Buddha",
+                    "6": "Konghucu",
+                    "7": "Lainnya"
+                };
+                inputAgama.value = agamaMap[pasien.agama] || 'N/A';
+                inputAgama.disabled = true;
+                // Logika untuk menampilkan 'Laki-laki' atau 'Perempuan'
+                inputJnsKelamin.value = pasien.jns_kelamin === 'pria' ? 'Laki-laki' : (pasien.jns_kelamin === 'perempuan' ? 'Perempuan' : pasien.jns_kelamin);
+                
+                // Format tanggal lahir
+                inputTglLahir.value = new Date(pasien.tgl_lahir).toLocaleDateString('id-ID', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                });
+                
+                inputAlamat.value = pasien.alamat;
+                inputNoHpPasien.value = pasien.no_hp_pasien;
+                inputEmailPasien.value = pasien.email_pasien;
+                inputGolDarah.value = pasien.gol_darah;
+
+                // Atur link tombol Edit
+                editButton.href = `index-pasien_edit.html?rm=${pasien.rm}`;
+
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                errorMessage.style.display = 'block';
+                console.error('Error fetching pasien detail:', error);
+                if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // Panggil fungsi untuk mengambil data saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', fetchPasienDetail);
+
+
+        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
+        let arrow = document.querySelectorAll(".arrow");
+        for (var i = 0; i < arrow.length; i++) {
+            arrow[i].addEventListener("click", (e) => {
+                let arrowParent = e.target.parentElement.parentElement;
+                console.log(arrowParent);
+                arrowParent.classList.toggle("showMenu");
+            });
+        }
+
+        let sidebar = document.querySelector(".sidebar");
+        let sidebarBtn = document.querySelector(".bx-menu");
+        console.log(sidebarBtn);
+        sidebarBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
+        function toggleProfilePopup() {
+            const popup = document.getElementById("profile-popup");
+            popup.classList.toggle("hidden");
+        }
+
+        document.addEventListener("click", function (e) {
+            const trigger = document.querySelector(".profile-trigger");
+            const popup = document.getElementById("profile-popup");
+
+            if (!trigger.contains(e.target) && !popup.contains(e.target)) {
+                popup.classList.add("hidden");
+            }
+        });
+    </script>
+</body>
+
+</html>

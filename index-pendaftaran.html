@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Hari Ini - Rumah Sakit Islam Banjarmasin</title>
+    <link rel="stylesheet" href="style/style-pendaftaran.css">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Gaya tambahan untuk pesan feedback */
+        .feedback-message {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            text-align: center;
+            display: none;
+            /* Default hidden */
+        }
+
+        .feedback-message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info-message {
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Styling for table actions */
+        .aksi img {
+            width: 20px;
+            /* Adjust as needed */
+            height: 20px;
+            /* Adjust as needed */
+            vertical-align: middle;
+            margin: 0 3px;
+            cursor: pointer;
+        }
+
+        /* Styling for modal (popup) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .modal-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .modal-body .form-group {
+            margin-bottom: 15px;
+        }
+
+        .modal-body label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .modal-body input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 1em;
+            color: #333;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+
+        .btn-cancel {
+            background-color: #ccc;
+            color: #333;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-cancel:hover {
+            background-color: #bbb;
+        }
+
+        .btn-print {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-print:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <img src="image/logo.svg" alt="Logo RS">
+            <span class="logo_name">
+                <h5>RUMAH SAKIT ISLAM<br>BANJARMASIN</h5>
+            </span>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <a href="index.html">
+                    <img src="image/beranda.svg" alt="Beranda">
+                    <span class="link_name">Beranda</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index.html" class="link_name">Beranda</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link active">
+                    <a href="index-pendaftaran.html">
+                        <img src="image/kunjungan.svg" alt="Kunjungan">
+                        <span class="link_name">Pendaftaran</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Pendaftaran</a></li>
+                    <li><a href="index-pendaftaran.html">Pendaftaran Hari Ini</a></li>
+                    <li><a href="index-pendaftaran-riwayat.html">Riwayat Pendaftaran</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="index-pasien.html">
+                    <img src="image/pasien.svg" alt="Pasien">
+                    <span class="link_name">Pasien</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="index-pasien.html" class="link_name">Pasien</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="icon-link">
+                    <a href="index-layanan.html">
+                        <img src="image/kunjungan.svg" alt="Layanan">
+                        <span class="link_name">Layanan</span>
+                    </a>
+                    <i class="bx bx-chevron-down arrow"></i>
+                </div>
+                <ul class="sub-menu">
+                    <li><a href="#" class="link_name">Layanan</a></li>
+                    <li><a href="index-layanan.html">Poli</a></li>
+                    <li><a href="index-layanan_dokter.html">Dokter</a></li>
+                    <li><a href="index-layanan_perawat.html"></a>Perawat</li>
+                </ul>
+            </li>
+            <li class="logout">
+                <a href="#" id="logoutButton" class="keluar">
+                    <img src="image/keluar.svg" alt="Keluar">
+                    <span class="link_name">Keluar</span>
+                </a>
+                <ul class="sub-menu blank">
+                    <li><a href="#" class="link_name">Keluar</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <section class="home-section">
+        <div class="home-content">
+            <i class="bx bx-menu"></i>
+            <div class="profile-trigger" onclick="toggleProfilePopup()">
+                <img src="image/admin.svg" alt="User" class="profile-icon">
+            </div>
+
+            <div id="profile-popup" class="profile-popup hidden">
+                <div class="popup-content">
+                    <img src="image/admin.svg" alt="User" class="popup-icon">
+                    <div>
+                        <div class="popup-name" id="userNameDisplay">Memuat...</div>
+                        <div class="popup-role" id="userRoleDisplay">Memuat...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <main>
+        <div class="main-content">
+            <h3>Pendaftaran Hari Ini</h3>
+            <div id="tanggalHari" style="text-align:right; margin-bottom:10px; font-weight:500; color:#333;"></div>
+            <script>
+                function tampilkanTanggalHari() {
+                    const hari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+                    const bulan = [
+                        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+                        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+                    ];
+                    const now = new Date();
+                    const namaHari = hari[now.getDay()];
+                    const tanggal = now.getDate();
+                    const namaBulan = bulan[now.getMonth()];
+                    const tahun = now.getFullYear();
+                    document.getElementById('tanggalHari').textContent =
+                        `${namaHari}, ${tanggal} ${namaBulan} ${tahun}`;
+                }
+                tampilkanTanggalHari();
+            </script>
+            <a href="index-pendaftaran_tambah.html" class="add-btn">
+                Tambah <i class="bx bxs-plus-circle"></i>
+            </a>
+        </div>
+        <div class="card">
+            <div id="loadingMessage" class="info-message">Memuat data pendaftaran...</div>
+            <div id="errorMessage" class="info-message error-message" style="display: none;"></div>
+            <div id="feedbackMessage" class="feedback-message" style="display: none;"></div>
+            <div class="top-bar">
+                <div class="search-group">
+                    <input type="text" placeholder="Cari berdasarkan No. Regis / Nama Pasien" id="searchInput" />
+                    <button class="search-btn" id="searchButton"><i class="bx bx-search"></i></button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>No. Regis</th>
+                            <th>Nama Pasien</th>
+                            <th>Nik</th>
+                            <th>Poli</th>
+                            <th>Dokter</th>
+                            <th>No. Antrian</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendaftaranTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div id="noDataMessage" class="info-message" style="display: none;">Tidak ada data pendaftaran hari ini.</div>
+
+
+            <div class="pagination-wrapper" style="display: none;">
+                <div class="pagination-center">Halaman 1/1</div>
+                <a href="#" class="pagination-next"><img src="image/hal-lanjut.svg" alt=""></a>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modalDetail">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Detail Pendaftaran</h3>
+                <span class="close-btn" onclick="closeDetailModal()">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="detail_no_regis">No. Regis</label>
+                    <input type="text" id="detail_no_regis" value="" disabled style="font-weight: 600;">
+                </div>
+                <div class="form-group">
+                    <label for="detail_rekam_medis">Rekam Medis</label>
+                    <input type="text" id="detail_rekam_medis" value="" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="detail_no_antrian">No Antrian</label>
+                    <input type="text" id="detail_no_antrian" value="" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="detail_namaPasien">Nama Pasien</label>
+                    <input type="text" id="detail_namaPasien" value="" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="detail_nik">NIK</label>
+                    <input type="text" id="detail_nik" value="" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="detail_poli">Poli Tujuan</label>
+                    <input type="text" id="detail_poli" value="" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="detail_dokter">Dokter</label>
+                    <input type="text" id="detail_dokter" value="" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="detail_status">Status</label>
+                    <input type="text" id="detail_status" value="" disabled>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeDetailModal()">Tutup</button>
+                <button class="btn-print" id="printButton"><img src="image/printer.svg" alt="">Cetak</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const BASE_API_URL = 'http://nazarfadil.me/api'; // Sesuaikan dengan URL Laravel Anda
+
+        // --- Elemen HTML yang akan dimanipulasi ---
+        const pendaftaranTableBody = document.getElementById('pendaftaranTableBody');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const errorMessage = document.getElementById('errorMessage');
+        const noDataMessage = document.getElementById('noDataMessage');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+
+        const userNameDisplay = document.getElementById('userNameDisplay');
+        const userRoleDisplay = document.getElementById('userRoleDisplay');
+        const logoutButton = document.getElementById('logoutButton');
+
+        // Modal detail elements
+        const modalDetail = document.getElementById('modalDetail');
+        const detailNoRegis = document.getElementById('detail_no_regis');
+        const detailRekamMedis = document.getElementById('detail_rekam_medis');
+        const detailNoAntrian = document.getElementById('detail_no_antrian');
+        const detailNamaPasien = document.getElementById('detail_namaPasien');
+        const detailNIK = document.getElementById('detail_nik');
+        const detailPoli = document.getElementById('detail_poli');
+        const detailDokter = document.getElementById('detail_dokter');
+        const detailStatus = document.getElementById('detail_status');
+        const printButton = document.getElementById('printButton');
+
+
+        // --- Proteksi Halaman & Data User ---
+        const authToken = localStorage.getItem('auth_token');
+        const userRole = localStorage.getItem('user_role');
+        const userName = localStorage.getItem('user_name');
+
+        if (!authToken) {
+            alert('Anda harus login terlebih dahulu.');
+            window.location.href = 'login.html';
+        }
+
+        userNameDisplay.textContent = userName || 'User';
+        userRoleDisplay.textContent = userRole || 'N/A';
+
+        // --- Fungsionalitas Logout ---
+        logoutButton.addEventListener('click', async (event) => {
+            event.preventDefault();
+
+            if (!confirm('Apakah Anda yakin ingin keluar?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/logout`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    console.log('Logout Sukses');
+                } else {
+                    const errorData = await response.json();
+                    console.error('Logout Gagal:', errorData.message || response.statusText);
+                }
+
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                console.error('Error saat logout:', error);
+                alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
+                // Tetap hapus token bahkan jika ada error jaringan untuk mencegah loop
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                window.location.href = 'login.html';
+            }
+        });
+
+        function showFeedbackMessage(message, type) {
+            feedbackMessage.textContent = message;
+            feedbackMessage.className = `feedback-message ${type}`;
+            feedbackMessage.style.display = 'block';
+            setTimeout(() => {
+                feedbackMessage.style.display = 'none';
+            }, 5000);
+        }
+
+        // --- Fungsi untuk Memuat Data Pendaftaran Hari Ini ---
+        async function loadPendaftarans(searchQuery = '') {
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            noDataMessage.style.display = 'none';
+            pendaftaranTableBody.innerHTML = '';
+            let url = new URL(`${BASE_API_URL}/pendaftarans`);
+            // Jika backend mendukung parameter 'status_not' untuk mengecualikan status tertentu, gunakan ini.
+            // Misalnya: url.searchParams.append('status_not', '3');
+            // Jika tidak, kita akan filter di sisi klien.
+
+            if (searchQuery) {
+                url.searchParams.append('search', searchQuery);
+            }
+
+            try {
+                const response = await fetch(url.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || `Gagal memuat data pendaftaran: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                // Filter data agar hanya status yang BUKAN 3 DAN BUKAN "Selesai" yang ditampilkan
+                const pendaftaransToShow = (result.data || []).filter(item =>
+                    String(item.status_raw) !== '3' && (typeof item.status !== 'string' || item.status.toLowerCase() !== 'selesai')
+                );
+
+
+                loadingMessage.style.display = 'none';
+
+                if (pendaftaransToShow.length === 0) {
+                    noDataMessage.style.display = 'block';
+                    noDataMessage.textContent = 'Tidak ada data pendaftaran yang sedang berlangsung.'; // Pesan disesuaikan
+                    return;
+                }
+
+                pendaftaransToShow.forEach((pendaftaran, index) => {
+                    const row = pendaftaranTableBody.insertRow();
+                    const statusClass = `status-${String(pendaftaran.status_raw || pendaftaran.status).toLowerCase().replace(/\s/g, '')}`;
+
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${pendaftaran.no_registrasi}</td>
+                        <td>${pendaftaran.nama_pasien || '-'}</td>
+                        <td>${pendaftaran.nik_pasien || '-'}</td>
+                        <td>${pendaftaran.nama_poli || '-'}</td>
+                        <td>${pendaftaran.nama_dokter || '-'}</td>
+                        <td>${pendaftaran.no_antrian}</td>
+                        <td class="${statusClass}">${pendaftaran.status}</td>
+                        <td class="aksi">
+                            <img src="image/call.png" alt="Panggil" class="status-btn" data-id="${pendaftaran.no_registrasi}" style="cursor:pointer;" title="Panggil Pasien">
+                            <img src="image/eye.svg" alt="Detail" class="detail-btn" data-id="${pendaftaran.no_registrasi}">
+                        </td>
+                    `;
+                });
+
+                // Tambahkan event listener untuk tombol detail setelah data dimuat
+                document.querySelectorAll('.detail-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        openDetailModal(id);
+                    });
+                });
+
+                // Tambahkan event listener untuk tombol status (call)
+                document.querySelectorAll('.status-btn').forEach(button => {
+                    button.addEventListener('click', async (event) => {
+                        const id = event.target.dataset.id;
+                        // Logika untuk mengubah status menjadi 'Dipanggil' (misalnya status 1)
+                        if (!confirm('Apakah Anda yakin ingin memanggil pasien ini dan mengubah status menjadi Dipanggil?')) {
+                            return;
+                        }
+                        try {
+                            const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                                method: 'PUT', // Atau PATCH, tergantung API Anda
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`
+                                },
+                                body: JSON.stringify({ status: 1 }) // Mengasumsikan '1' adalah status 'Dipanggil'
+                            });
+
+                            if (!response.ok) {
+                                const errorDetails = await response.json();
+                                throw new Error(errorDetails.message || `Gagal mengubah status: ${response.statusText}`);
+                            }
+
+                            showFeedbackMessage('Status berhasil diubah menjadi Dipanggil.', 'success');
+                            loadPendaftarans(searchInput.value.trim()); // Muat ulang data untuk merefleksikan perubahan
+
+                        } catch (error) {
+                            showFeedbackMessage('Gagal mengubah status: ' + error.message, 'error');
+                            if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user_role');
+                                localStorage.removeItem('user_name');
+                                alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                                window.location.href = 'login.html';
+                            }
+                        }
+                    });
+                });
+
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Gagal memuat data pendaftaran: ' + error.message;
+                console.error('Error fetching pendaftaran data:', error);
+                if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+
+        // --- Fungsionalitas Modal Detail ---
+        async function openDetailModal(id) {
+            try {
+                const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || `Gagal memuat detail pendaftaran: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+                const pendaftaran = result.data;
+
+                // Periksa status pendaftaran: hanya tampilkan jika BUKAN status 3 atau "Selesai"
+                if (String(pendaftaran.status_raw) === '3' || (typeof pendaftaran.status === 'string' && pendaftaran.status.toLowerCase() === 'selesai')) {
+                    showFeedbackMessage('Detail pendaftaran ini berstatus "Selesai" dan tidak ditampilkan di sini.', 'error');
+                    return; // Jangan tampilkan modal jika status adalah "Selesai"
+                }
+
+                // Isi detail modal
+                detailNoRegis.value = pendaftaran.no_registrasi || '';
+                detailRekamMedis.value = pendaftaran.rm || '';
+                detailNoAntrian.value = pendaftaran.no_antrian || '';
+                detailNamaPasien.value = pendaftaran.nama_pasien || '';
+                detailNIK.value = pendaftaran.nik_pasien || '';
+                detailPoli.value = pendaftaran.nama_poli || '';
+                detailDokter.value = pendaftaran.nama_dokter || '';
+                detailStatus.value = pendaftaran.status || '';
+
+                modalDetail.style.display = 'flex';
+            } catch (error) {
+                showFeedbackMessage('Gagal menampilkan detail pendaftaran: ' + error.message, 'error');
+                console.error('Error fetching pendaftaran detail:', error);
+                if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        function closeDetailModal() {
+            modalDetail.style.display = 'none';
+        }
+
+        // Fungsionalitas tombol cetak (placeholder)
+        printButton.addEventListener('click', () => {
+            alert('Fungsionalitas cetak belum diimplementasikan.');
+            // Anda bisa mengimplementasikan window.print() atau logic cetak lainnya di sini
+        });
+
+
+        // --- Fungsionalitas Pencarian ---
+        searchButton.addEventListener('click', async () => {
+            const query = searchInput.value.trim();
+            // Sembunyikan data sebelumnya sebelum pencarian baru
+            pendaftaranTableBody.innerHTML = '';
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            noDataMessage.style.display = 'none';
+
+            if (!query) {
+            loadPendaftarans('');
+            return;
+            }
+
+            try {
+            const url = new URL(`${BASE_API_URL}/pendaftarans`);
+            url.searchParams.append('search', query);
+
+            const response = await fetch(url.toString(), {
+                method: 'GET',
+                headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+                }
+            });
+
+            if (!response.ok) {
+                const errorDetails = await response.json();
+                throw new Error(errorDetails.message || `Gagal memuat data pendaftaran: ${response.statusText}`);
+            }
+
+            const result = await response.json();
+            // Filter hanya berdasarkan nama_pasien (case-insensitive)
+            const filtered = (result.data || []).filter(item =>
+                item.nama_pasien && item.nama_pasien.toLowerCase().includes(query.toLowerCase()) &&
+                String(item.status_raw) !== '3' &&
+                (typeof item.status !== 'string' || item.status.toLowerCase() !== 'selesai')
+            );
+
+            loadingMessage.style.display = 'none';
+
+            if (filtered.length === 0) {
+                noDataMessage.style.display = 'block';
+                noDataMessage.textContent = `Data Pendaftaran Pasien ${query} tidak ada`;
+                return;
+            }
+
+            filtered.forEach((pendaftaran, index) => {
+                const row = pendaftaranTableBody.insertRow();
+                const statusClass = `status-${String(pendaftaran.status_raw || pendaftaran.status).toLowerCase().replace(/\s/g, '')}`;
+
+                row.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${pendaftaran.no_registrasi}</td>
+                <td>${pendaftaran.nama_pasien || '-'}</td>
+                <td>${pendaftaran.nik_pasien || '-'}</td>
+                <td>${pendaftaran.nama_poli || '-'}</td>
+                <td>${pendaftaran.nama_dokter || '-'}</td>
+                <td>${pendaftaran.no_antrian}</td>
+                <td class="${statusClass}">${pendaftaran.status}</td>
+                <td class="aksi">
+                    <img src="image/call.png" alt="Panggil" class="status-btn" data-id="${pendaftaran.no_registrasi}" style="cursor:pointer;" title="Panggil Pasien">
+                    <img src="image/eye.svg" alt="Detail" class="detail-btn" data-id="${pendaftaran.no_registrasi}">
+                </td>
+                `;
+            });
+
+            // Tambahkan event listener untuk tombol detail setelah data dimuat
+            document.querySelectorAll('.detail-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                const id = event.target.dataset.id;
+                openDetailModal(id);
+                });
+            });
+
+            // Tambahkan event listener untuk tombol status (call)
+            document.querySelectorAll('.status-btn').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                const id = event.target.dataset.id;
+                if (!confirm('Apakah Anda yakin ingin memanggil pasien ini dan mengubah status menjadi Dipanggil?')) {
+                    return;
+                }
+                try {
+                    const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ status: 1 })
+                    });
+
+                    if (!response.ok) {
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || `Gagal mengubah status: ${response.statusText}`);
+                    }
+
+                    showFeedbackMessage('Status berhasil diubah menjadi Dipanggil.', 'success');
+                    searchButton.click(); // Refresh hasil pencarian
+
+                } catch (error) {
+                    showFeedbackMessage('Gagal mengubah status: ' + error.message, 'error');
+                    if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('user_role');
+                    localStorage.removeItem('user_name');
+                    alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                    window.location.href = 'login.html';
+                    }
+                }
+                });
+            });
+
+            } catch (error) {
+            loadingMessage.style.display = 'none';
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'Gagal memuat data pendaftaran: ' + error.message;
+            if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                localStorage.removeItem('auth_token');
+                localStorage.removeItem('user_role');
+                localStorage.removeItem('user_name');
+                alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                window.location.href = 'login.html';
+            }
+            }
+        });
+
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+            // Sembunyikan data sebelumnya sebelum pencarian baru
+            pendaftaranTableBody.innerHTML = '';
+            const query = searchInput.value.trim();
+            loadPendaftarans(query);
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', loadPendaftarans);
+
+
+        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
+        let arrow = document.querySelectorAll(".arrow");
+        for (var i = 0; i < arrow.length; i++) {
+            arrow[i].addEventListener("click", (e) => {
+                let arrowParent = e.target.parentElement.parentElement;
+                arrowParent.classList.toggle("showMenu");
+            });
+        }
+
+        let sidebar = document.querySelector(".sidebar");
+        let sidebarBtn = document.querySelector(".bx-menu");
+        sidebarBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("close");
+        });
+
+        function toggleProfilePopup() {
+            const popup = document.getElementById("profile-popup");
+            popup.classList.toggle("hidden");
+        }
+
+        document.addEventListener("click", function(e) {
+            const trigger = document.querySelector(".profile-trigger");
+            const popup = document.getElementById("profile-popup");
+
+            if (!trigger.contains(e.target) && !popup.contains(e.target)) {
+                popup.classList.add("hidden");
+            }
+        });
+    </script>
+</body>
+
+</html>
