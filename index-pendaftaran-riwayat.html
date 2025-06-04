@@ -183,7 +183,6 @@
 
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeDetailModal()">Tutup</button>
-                <button class="btn-print" id="printButton"><img src="image/printer.svg" alt="">Cetak</button>
             </div>
         </div>
     </div>
@@ -212,7 +211,6 @@
         const detailPoli = document.getElementById('detail_poli');
         const detailDokter = document.getElementById('detail_dokter');
         const detailStatus = document.getElementById('detail_status');
-        const printButton = document.getElementById('printButton');
 
 
         const authToken = localStorage.getItem('auth_token');
@@ -406,9 +404,7 @@
             modalDetail.style.display = 'none';
         }
 
-        printButton.addEventListener('click', () => {
-            alert('Fungsionalitas cetak belum diimplementasikan.');
-        });
+        
 
         searchButton.addEventListener('click', async () => {
             const query = searchInput.value.trim();

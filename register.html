@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun - Rumah Sakit Islam Banjarmasin</title>
+    <link rel="stylesheet" href="style/register.css">
+    <link rel="icon" href="../frontend/image/logo_rs.png" type="image/png">
+</head>
+
+<body>
+    <header>
+        <div class="header-container">
+            <img src="../frontend/image/logo_rs.png" alt="Logo Rumah Sakit" class="logo">
+            <h1>RUMAH SAKIT ISLAM BANJARMASIN</h1>
+        </div>
+    </header>
+    <main>
+        <div class="login-card">
+            <h2>Daftar Akun</h2>
+            <form id="registerForm">
+                <!-- Nama -->
+                <label for="nama">Nama</label>
+                <div class="input-group">
+                    <img src="../frontend/image/profile.svg" alt="icon Nama" class="icon">
+                    <input type="text" id="nama" placeholder="Masukkan Nama Anda" required>
+                </div>
+
+                <!-- Email -->
+                <label for="email">Email</label>
+                <div class="input-group">
+                    <img src="../frontend/image/sms.svg" alt="icon Email" class="icon">
+                    <input type="email" id="email" placeholder="Masukkan Email Anda" required>
+                </div>
+
+                <!-- Password -->
+                <label for="password">Kata Sandi</label>
+                <div class="input-group">
+                    <img src="../frontend/image/key.svg" alt="icon Sandi" class="icon">
+                    <input type="password" id="password" placeholder="Masukkan Kata Sandi" required>
+                </div>
+
+                <!-- Konfirmasi Password -->
+                <label for="confirmPassword">Konfirmasi Kata Sandi</label>
+                <div class="input-group">
+                    <img src="../frontend/image/key.svg" alt="icon Konfirmasi Sandi" class="icon">
+                    <input type="password" id="confirmPassword" placeholder="Masukkan Lagi Kata Sandi Anda" required>
+                </div>
+
+                <!-- Pilih Role -->
+                <label for="role">Pilih Role</label>
+                <div class="input-group select-group">
+                    <img src="../frontend/image/tag-user.svg" alt="icon role" class="icon">
+                    <select id="role" required>
+                        <option value="" disabled selected>-- Pilih Role --</option>
+                        <option value="1">Admin</option>
+                        <option value="2">Dokter</option>
+                        <option value="3">Petugas</option>
+                        <option value="4">Admin</option>
+                        <option value="5">Dokter</option>
+                        <option value="6">Petugas</option>
+                        <option value="7">Admin</option>
+                        <option value="8">Dokter</option>
+                    </select>
+                </div>
+                <button type="submit">Daftar</button>
+            </form>
+
+            <p class="register-text">Sudah punya akun? <a href="login.html">Masuk disini</a></p>
+        </div>
+    </main>
+
+    <script>
+        const BASE_API_URL = 'https://nazarfadil.me/api';
+
+        const registerForm = document.getElementById('registerForm');
+
+        registerForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const nama = document.getElementById('nama').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const role = document.getElementById('role').value;
+
+            if (password !== confirmPassword) {
+                alert('Kata sandi tidak cocok!');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BASE_API_URL}/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: nama,
+                        email: email,
+                        password: password,
+                        password_confirmation: confirmPassword,
+                        role: role
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Akun berhasil dibuat! Silakan login.');
+                    window.location.href = 'login.html';
+                } else {
+                    let errorMessage = 'Terjadi kesalahan tidak dikenal.';
+                    if (response.status === 422 && data.errors) {
+                        errorMessage = Object.values(data.errors).flat().join('\n');
+                    } else if (data.message) {
+                        errorMessage = data.message;
+                    }
+                    alert(`Gagal mendaftar: ${errorMessage}`);
+                }
+            } catch (error) {
+                alert('Tidak dapat terhubung ke server.');
+                console.error(error);
+            }
+        });
+        document.getElementById('registerForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const nama = document.getElementById('nama').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const role = document.getElementById('role').value;
+
+            if (password !== confirmPassword) {
+                alert('Kata sandi tidak cocok!');
+                return;
+            }
+
+            // Simulasi pendaftaran akun
+            alert(`Akun berhasil dibuat!\nNama: ${nama}\nEmail: ${email}\nRole: ${role}`);
+        });
+
+    </script>
+
+</body>
+
+</html>

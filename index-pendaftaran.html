@@ -363,7 +363,6 @@
 
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeDetailModal()">Tutup</button>
-                <button class="btn-print" id="printButton"><img src="image/printer.svg" alt="">Cetak</button>
             </div>
         </div>
     </div>
@@ -395,7 +394,6 @@
         const detailPoli = document.getElementById('detail_poli');
         const detailDokter = document.getElementById('detail_dokter');
         const detailStatus = document.getElementById('detail_status');
-        const printButton = document.getElementById('printButton');
 
 
         // --- Proteksi Halaman & Data User ---
@@ -640,12 +638,6 @@
         function closeDetailModal() {
             modalDetail.style.display = 'none';
         }
-
-        // Fungsionalitas tombol cetak (placeholder)
-        printButton.addEventListener('click', () => {
-            alert('Fungsionalitas cetak belum diimplementasikan.');
-            // Anda bisa mengimplementasikan window.print() atau logic cetak lainnya di sini
-        });
 
 
         // --- Fungsionalitas Pencarian ---
