@@ -89,17 +89,23 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    // Login berhasil!
-                    const token = data.access_token;
-                    const userName = data.user.name;
+    // Login berhasil!
+    const token = data.access_token;
+    const userName = data.user.name;
 
-                    showMessage(`Login berhasil! Selamat datang, ${userName}.`, 'success');
-                    console.log('Login Sukses:', data);
-                    console.log('Token:', token);
+    showMessage(`Login berhasil! Selamat datang, ${userName}.`, 'success');
+    console.log('Login Sukses:', data);
+    console.log('Token:', token);
 
-                    // Simpan token dan role di localStorage
-                    localStorage.setItem('auth_token', token);
-                    localStorage.setItem('user_name', userName); // Opsional: simpan nama user
+    // Simpan token dan role di localStorage
+    localStorage.setItem('auth_token', token);
+    localStorage.setItem('user_name', userName); // Opsional: simpan nama user
+
+    // Redirect ke index.html setelah login berhasil
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1000); // Tunggu 1 detik sebelum redirect (opsional)
+}
 
                     
                 } else {
