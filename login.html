@@ -91,7 +91,7 @@
                 if (response.ok) {
                     // Login berhasil!
                     const token = data.access_token;
-                    const userRole = data.user.role; // Ambil role dari respons
+                    const userRole = data.user.roles; // Ambil roles dari respons
                     const userName = data.user.name;
 
                     showMessage(`Login berhasil! Selamat datang, ${userName} (${userRole}).`, 'success');
