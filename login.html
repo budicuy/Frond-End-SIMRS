@@ -76,7 +76,7 @@
             const password = passwordInput.value;
 
             try {
-                const response = await fetch(`${BASE_API_URL}/auth/login`, {
+                const response = await fetch(`${BASE_API_URL}/login`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -91,7 +91,7 @@
                 if (response.ok) {
                     // Login berhasil!
                     const token = data.access_token;
-                    const userRole = data.user.role; // Ambil role dari respons
+                    const userRole = data.user.roles; // Ambil role dari respons
                     const userName = data.user.name;
 
                     showMessage(`Login berhasil! Selamat datang, ${userName} (${userRole}).`, 'success');
