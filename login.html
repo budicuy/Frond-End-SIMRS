@@ -89,23 +89,45 @@
                 const data = await response.json();
 
                 if (response.ok) {
-    // Login berhasil!
-    const token = data.access_token;
-    const userName = data.user.name;
+                    // Login berhasil!
+                    const token = data.access_token;
+                    const userRole = data.user.roles; // Ambil role dari respons
+                    const userName = data.user.name;
 
-    showMessage(`Login berhasil! Selamat datang, ${userName}.`, 'success');
-    console.log('Login Sukses:', data);
-    console.log('Token:', token);
+                    showMessage(`Login berhasil! Selamat datang, ${userName} (${userRole}).`, 'success');
+                    console.log('Login Sukses:', data);
+                    console.log('Token:', token);
+                    console.log('Role Pengguna:', userRole);
 
-    // Simpan token dan role di localStorage
-    localStorage.setItem('auth_token', token);
-    localStorage.setItem('user_name', userName); // Opsional: simpan nama user
+                    // Simpan token dan role di localStorage
+                    localStorage.setItem('auth_token', token);
+                    localStorage.setItem('user_role', userRole);
+                    localStorage.setItem('user_name', userName); // Opsional: simpan nama user
 
-    // Redirect ke index.html setelah login berhasil
-    setTimeout(() => {
-        window.location.href = 'index.html';
-    }, 1000); // Tunggu 1 detik sebelum redirect (opsional)
-                    
+                    // === PENTING: Arahkan pengguna berdasarkan role ===
+                    // Anda bisa menambahkan logika pengalihan di sini
+                    // Pastikan userRole bertipe string untuk perbandingan yang konsisten
+                    const roleStr = String(userRole);
+                    if (roleStr === 'admin') {
+                        window.location.href = 'index.html'; // Admin
+                    } else if (roleStr === 'super_admin' || roleStr === '1') {
+                        window.location.href = 'index.html'; // Admin pendaftaran
+                    } else if (roleStr === '3') {
+                        window.location.href = 'https://ti054a02.agussbn.my.id'; // Dokter
+                    } else if (roleStr === '4') {
+                        window.location.href = 'https://ti054a02.agussbn.my.id'; // Perawat
+                    } else if (roleStr === '5') {
+                        window.location.href = 'https://ti054a03.agussbn.my.id'; // Petugas Kasir
+                    } else if (roleStr === '6') {
+                        window.location.href = 'https://ti054a03.agussbn.my.id'; // Admin Kasir
+                    } else if (roleStr === '7') {
+                        window.location.href = 'https://ti054a04.agussbn.my.id'; // Petugas Apotik
+                    } else if (roleStr === '8') {
+                        window.location.href = 'https://ti054a04.agussbn.my.id'; // Admin Apotik
+                    } else {
+                        showMessage('Role pengguna tidak dikenali. Silakan hubungi admin.', 'error');
+                    }
+
                 } else {
                     let errorMessage = 'Terjadi kesalahan tidak dikenal.';
                     if (response.status === 422 && data.errors) {
