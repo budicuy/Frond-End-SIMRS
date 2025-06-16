@@ -108,9 +108,9 @@
                     // Anda bisa menambahkan logika pengalihan di sini
                     // Pastikan userRole bertipe string untuk perbandingan yang konsisten
                     const roleStr = String(userRole);
-                    if (roleStr === '1') {
+                    if (roleStr === 'admin') {
                         window.location.href = 'index.html'; // Admin
-                    } else if (roleStr === '2') {
+                    } else if (roleStr === 'super_admin') {
                         window.location.href = 'index.html'; // Admin pendaftaran
                     } else if (roleStr === '3') {
                         window.location.href = 'https://ti054a02.agussbn.my.id'; // Dokter
