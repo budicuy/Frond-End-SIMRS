@@ -453,7 +453,7 @@
             errorMessage.style.display = 'none';
             noDataMessage.style.display = 'none';
             pendaftaranTableBody.innerHTML = '';
-            let url = new URL(`${BASE_API_URL}/pendaftarans`);
+            let url = new URL(`${BASE_API_URL}/api/pendaftarans`);
 
             if (searchQuery) {
                 url.searchParams.append('search', searchQuery);
@@ -492,12 +492,11 @@
                     const statusClass = `status-${String(pendaftaran.status).toLowerCase().replace(/\s/g, '')}`;
 
                     row.innerHTML = `
-                        <td>${index + 1}</td>
                         <td>${pendaftaran.id}</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>${pendaftaran.id_poli}</td>
-                        <td>-</td>
+                        <td>${pendaftaran.rm}</td>
+                        <td>${pasien.nama_pasien}</td>
+                        <td>${pasien.nik}</td>
+                        <td>${poli.nama_poli}</td>
                         <td>${pendaftaran.no_antrian}</td>
                         <td class="${statusClass}">${pendaftaran.status}</td>
                         <td class="aksi">
@@ -569,7 +568,7 @@
         // --- Fungsionalitas Modal Detail ---
         async function openDetailModal(id) {
             try {
-                const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                const response = await fetch(`${BASE_API_URL}/api/pendaftarans/${id}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -631,7 +630,7 @@
             }
 
             try {
-                const url = new URL(`${BASE_API_URL}/pendaftarans`);
+                const url = new URL(`${BASE_API_URL}/api/pendaftarans`);
                 url.searchParams.append('search', query);
 
                 const response = await fetch(url.toString(), {
@@ -697,7 +696,7 @@
                             return;
                         }
                         try {
-                            const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                            const response = await fetch(`${BASE_API_URL}/api/pendaftarans/${id}`, {
                                 method: 'PUT',
                                 headers: {
                                     'Accept': 'application/json',
