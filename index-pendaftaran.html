@@ -369,7 +369,7 @@
 
 
     <script>
-        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Sesuaikan dengan URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api';
 
         // --- Elemen HTML yang akan dimanipulasi ---
         const pendaftaranTableBody = document.getElementById('pendaftaranTableBody');
@@ -394,7 +394,6 @@
         const detailPoli = document.getElementById('detail_poli');
         const detailDokter = document.getElementById('detail_dokter');
         const detailStatus = document.getElementById('detail_status');
-
 
         // --- Proteksi Halaman & Data User ---
         const authToken = localStorage.getItem('auth_token');
@@ -426,22 +425,12 @@
                     }
                 });
 
-                if (response.ok) {
-                    console.log('Logout Sukses');
-                } else {
-                    const errorData = await response.json();
-                    console.error('Logout Gagal:', errorData.message || response.statusText);
-                }
-
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('user_role');
                 localStorage.removeItem('user_name');
                 window.location.href = 'login.html';
 
             } catch (error) {
-                console.error('Error saat logout:', error);
-                alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
-                // Tetap hapus token bahkan jika ada error jaringan untuk mencegah loop
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('user_role');
                 localStorage.removeItem('user_name');
@@ -465,9 +454,6 @@
             noDataMessage.style.display = 'none';
             pendaftaranTableBody.innerHTML = '';
             let url = new URL(`${BASE_API_URL}/pendaftarans`);
-            // Jika backend mendukung parameter 'status_not' untuk mengecualikan status tertentu, gunakan ini.
-            // Misalnya: url.searchParams.append('status_not', '3');
-            // Jika tidak, kita akan filter di sisi klien.
 
             if (searchQuery) {
                 url.searchParams.append('search', searchQuery);
@@ -488,41 +474,39 @@
                 }
 
                 const result = await response.json();
-                // Filter data agar hanya status yang BUKAN 3 DAN BUKAN "Selesai" yang ditampilkan
+                // Data sesuai tipe JSON yang diberikan
                 const pendaftaransToShow = (result.data || []).filter(item =>
-                    String(item.status_raw) !== '3' && (typeof item.status !== 'string' || item.status.toLowerCase() !== 'selesai')
+                    String(item.status) !== '3' && (typeof item.status !== 'string' || item.status.toLowerCase() !== 'selesai')
                 );
-
 
                 loadingMessage.style.display = 'none';
 
                 if (pendaftaransToShow.length === 0) {
                     noDataMessage.style.display = 'block';
-                    noDataMessage.textContent = 'Tidak ada data pendaftaran yang sedang berlangsung.'; // Pesan disesuaikan
+                    noDataMessage.textContent = 'Tidak ada data pendaftaran yang sedang berlangsung.';
                     return;
                 }
 
                 pendaftaransToShow.forEach((pendaftaran, index) => {
                     const row = pendaftaranTableBody.insertRow();
-                    const statusClass = `status-${String(pendaftaran.status_raw || pendaftaran.status).toLowerCase().replace(/\s/g, '')}`;
+                    const statusClass = `status-${String(pendaftaran.status).toLowerCase().replace(/\s/g, '')}`;
 
                     row.innerHTML = `
                         <td>${index + 1}</td>
-                        <td>${pendaftaran.no_registrasi}</td>
-                        <td>${pendaftaran.nama_pasien || '-'}</td>
-                        <td>${pendaftaran.nik_pasien || '-'}</td>
-                        <td>${pendaftaran.nama_poli || '-'}</td>
-                        <td>${pendaftaran.nama_dokter || '-'}</td>
+                        <td>${pendaftaran.id}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>${pendaftaran.id_poli}</td>
+                        <td>-</td>
                         <td>${pendaftaran.no_antrian}</td>
                         <td class="${statusClass}">${pendaftaran.status}</td>
                         <td class="aksi">
-                            <img src="image/call.png" alt="Panggil" class="status-btn" data-id="${pendaftaran.no_registrasi}" style="cursor:pointer;" title="Panggil Pasien">
-                            <img src="image/eye.svg" alt="Detail" class="detail-btn" data-id="${pendaftaran.no_registrasi}">
+                            <img src="image/call.png" alt="Panggil" class="status-btn" data-id="${pendaftaran.id}" style="cursor:pointer;" title="Panggil Pasien">
+                            <img src="image/eye.svg" alt="Detail" class="detail-btn" data-id="${pendaftaran.id}">
                         </td>
                     `;
                 });
 
-                // Tambahkan event listener untuk tombol detail setelah data dimuat
                 document.querySelectorAll('.detail-btn').forEach(button => {
                     button.addEventListener('click', (event) => {
                         const id = event.target.dataset.id;
@@ -530,23 +514,21 @@
                     });
                 });
 
-                // Tambahkan event listener untuk tombol status (call)
                 document.querySelectorAll('.status-btn').forEach(button => {
                     button.addEventListener('click', async (event) => {
                         const id = event.target.dataset.id;
-                        // Logika untuk mengubah status menjadi 'Dipanggil' (misalnya status 1)
                         if (!confirm('Apakah Anda yakin ingin memanggil pasien ini dan mengubah status menjadi Dipanggil?')) {
                             return;
                         }
                         try {
                             const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
-                                method: 'PUT', // Atau PATCH, tergantung API Anda
+                                method: 'PUT',
                                 headers: {
                                     'Accept': 'application/json',
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${authToken}`
                                 },
-                                body: JSON.stringify({ status: 1 }) // Mengasumsikan '1' adalah status 'Dipanggil'
+                                body: JSON.stringify({ status: 1 })
                             });
 
                             if (!response.ok) {
@@ -555,7 +537,7 @@
                             }
 
                             showFeedbackMessage('Status berhasil diubah menjadi Dipanggil.', 'success');
-                            loadPendaftarans(searchInput.value.trim()); // Muat ulang data untuk merefleksikan perubahan
+                            loadPendaftarans(searchInput.value.trim());
 
                         } catch (error) {
                             showFeedbackMessage('Gagal mengubah status: ' + error.message, 'error');
@@ -574,7 +556,6 @@
                 loadingMessage.style.display = 'none';
                 errorMessage.style.display = 'block';
                 errorMessage.textContent = 'Gagal memuat data pendaftaran: ' + error.message;
-                console.error('Error fetching pendaftaran data:', error);
                 if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user_role');
@@ -584,7 +565,6 @@
                 }
             }
         }
-
 
         // --- Fungsionalitas Modal Detail ---
         async function openDetailModal(id) {
@@ -605,26 +585,24 @@
                 const result = await response.json();
                 const pendaftaran = result.data;
 
-                // Periksa status pendaftaran: hanya tampilkan jika BUKAN status 3 atau "Selesai"
-                if (String(pendaftaran.status_raw) === '3' || (typeof pendaftaran.status === 'string' && pendaftaran.status.toLowerCase() === 'selesai')) {
+                if (String(pendaftaran.status) === '3' || (typeof pendaftaran.status === 'string' && pendaftaran.status.toLowerCase() === 'selesai')) {
                     showFeedbackMessage('Detail pendaftaran ini berstatus "Selesai" dan tidak ditampilkan di sini.', 'error');
-                    return; // Jangan tampilkan modal jika status adalah "Selesai"
+                    return;
                 }
 
-                // Isi detail modal
-                detailNoRegis.value = pendaftaran.no_registrasi || '';
+                // Isi detail modal sesuai tipe data JSON
+                detailNoRegis.value = pendaftaran.id || '';
                 detailRekamMedis.value = pendaftaran.rm || '';
                 detailNoAntrian.value = pendaftaran.no_antrian || '';
-                detailNamaPasien.value = pendaftaran.nama_pasien || '';
-                detailNIK.value = pendaftaran.nik_pasien || '';
-                detailPoli.value = pendaftaran.nama_poli || '';
-                detailDokter.value = pendaftaran.nama_dokter || '';
+                detailNamaPasien.value = '-';
+                detailNIK.value = '-';
+                detailPoli.value = pendaftaran.id_poli || '';
+                detailDokter.value = '-';
                 detailStatus.value = pendaftaran.status || '';
 
                 modalDetail.style.display = 'flex';
             } catch (error) {
                 showFeedbackMessage('Gagal menampilkan detail pendaftaran: ' + error.message, 'error');
-                console.error('Error fetching pendaftaran detail:', error);
                 if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user_role');
@@ -639,147 +617,140 @@
             modalDetail.style.display = 'none';
         }
 
-
         // --- Fungsionalitas Pencarian ---
         searchButton.addEventListener('click', async () => {
             const query = searchInput.value.trim();
-            // Sembunyikan data sebelumnya sebelum pencarian baru
             pendaftaranTableBody.innerHTML = '';
             loadingMessage.style.display = 'block';
             errorMessage.style.display = 'none';
             noDataMessage.style.display = 'none';
 
             if (!query) {
-            loadPendaftarans('');
-            return;
-            }
-
-            try {
-            const url = new URL(`${BASE_API_URL}/pendaftarans`);
-            url.searchParams.append('search', query);
-
-            const response = await fetch(url.toString(), {
-                method: 'GET',
-                headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-                }
-            });
-
-            if (!response.ok) {
-                const errorDetails = await response.json();
-                throw new Error(errorDetails.message || `Gagal memuat data pendaftaran: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            // Filter hanya berdasarkan nama_pasien (case-insensitive)
-            const filtered = (result.data || []).filter(item =>
-                item.nama_pasien && item.nama_pasien.toLowerCase().includes(query.toLowerCase()) &&
-                String(item.status_raw) !== '3' &&
-                (typeof item.status !== 'string' || item.status.toLowerCase() !== 'selesai')
-            );
-
-            loadingMessage.style.display = 'none';
-
-            if (filtered.length === 0) {
-                noDataMessage.style.display = 'block';
-                noDataMessage.textContent = `Data Pendaftaran Pasien ${query} tidak ada`;
+                loadPendaftarans('');
                 return;
             }
 
-            filtered.forEach((pendaftaran, index) => {
-                const row = pendaftaranTableBody.insertRow();
-                const statusClass = `status-${String(pendaftaran.status_raw || pendaftaran.status).toLowerCase().replace(/\s/g, '')}`;
+            try {
+                const url = new URL(`${BASE_API_URL}/pendaftarans`);
+                url.searchParams.append('search', query);
 
-                row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${pendaftaran.no_registrasi}</td>
-                <td>${pendaftaran.nama_pasien || '-'}</td>
-                <td>${pendaftaran.nik_pasien || '-'}</td>
-                <td>${pendaftaran.nama_poli || '-'}</td>
-                <td>${pendaftaran.nama_dokter || '-'}</td>
-                <td>${pendaftaran.no_antrian}</td>
-                <td class="${statusClass}">${pendaftaran.status}</td>
-                <td class="aksi">
-                    <img src="image/call.png" alt="Panggil" class="status-btn" data-id="${pendaftaran.no_registrasi}" style="cursor:pointer;" title="Panggil Pasien">
-                    <img src="image/eye.svg" alt="Detail" class="detail-btn" data-id="${pendaftaran.no_registrasi}">
-                </td>
-                `;
-            });
-
-            // Tambahkan event listener untuk tombol detail setelah data dimuat
-            document.querySelectorAll('.detail-btn').forEach(button => {
-                button.addEventListener('click', (event) => {
-                const id = event.target.dataset.id;
-                openDetailModal(id);
-                });
-            });
-
-            // Tambahkan event listener untuk tombol status (call)
-            document.querySelectorAll('.status-btn').forEach(button => {
-                button.addEventListener('click', async (event) => {
-                const id = event.target.dataset.id;
-                if (!confirm('Apakah Anda yakin ingin memanggil pasien ini dan mengubah status menjadi Dipanggil?')) {
-                    return;
-                }
-                try {
-                    const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
-                    method: 'PUT',
+                const response = await fetch(url.toString(), {
+                    method: 'GET',
                     headers: {
                         'Accept': 'application/json',
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authToken}`
-                    },
-                    body: JSON.stringify({ status: 1 })
-                    });
-
-                    if (!response.ok) {
-                    const errorDetails = await response.json();
-                    throw new Error(errorDetails.message || `Gagal mengubah status: ${response.statusText}`);
                     }
+                });
 
-                    showFeedbackMessage('Status berhasil diubah menjadi Dipanggil.', 'success');
-                    searchButton.click(); // Refresh hasil pencarian
+                if (!response.ok) {
+                    const errorDetails = await response.json();
+                    throw new Error(errorDetails.message || `Gagal memuat data pendaftaran: ${response.statusText}`);
+                }
 
-                } catch (error) {
-                    showFeedbackMessage('Gagal mengubah status: ' + error.message, 'error');
-                    if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                const result = await response.json();
+                // Filter hanya berdasarkan id (No. Regis) karena nama_pasien tidak ada
+                const filtered = (result.data || []).filter(item =>
+                    String(item.id).includes(query) &&
+                    String(item.status) !== '3' &&
+                    (typeof item.status !== 'string' || item.status.toLowerCase() !== 'selesai')
+                );
+
+                loadingMessage.style.display = 'none';
+
+                if (filtered.length === 0) {
+                    noDataMessage.style.display = 'block';
+                    noDataMessage.textContent = `Data Pendaftaran dengan No. Regis ${query} tidak ada`;
+                    return;
+                }
+
+                filtered.forEach((pendaftaran, index) => {
+                    const row = pendaftaranTableBody.insertRow();
+                    const statusClass = `status-${String(pendaftaran.status).toLowerCase().replace(/\s/g, '')}`;
+
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${pendaftaran.id}</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>${pendaftaran.id_poli}</td>
+                        <td>-</td>
+                        <td>${pendaftaran.no_antrian}</td>
+                        <td class="${statusClass}">${pendaftaran.status}</td>
+                        <td class="aksi">
+                            <img src="image/call.png" alt="Panggil" class="status-btn" data-id="${pendaftaran.id}" style="cursor:pointer;" title="Panggil Pasien">
+                            <img src="image/eye.svg" alt="Detail" class="detail-btn" data-id="${pendaftaran.id}">
+                        </td>
+                    `;
+                });
+
+                document.querySelectorAll('.detail-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        openDetailModal(id);
+                    });
+                });
+
+                document.querySelectorAll('.status-btn').forEach(button => {
+                    button.addEventListener('click', async (event) => {
+                        const id = event.target.dataset.id;
+                        if (!confirm('Apakah Anda yakin ingin memanggil pasien ini dan mengubah status menjadi Dipanggil?')) {
+                            return;
+                        }
+                        try {
+                            const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`
+                                },
+                                body: JSON.stringify({ status: 1 })
+                            });
+
+                            if (!response.ok) {
+                                const errorDetails = await response.json();
+                                throw new Error(errorDetails.message || `Gagal mengubah status: ${response.statusText}`);
+                            }
+
+                            showFeedbackMessage('Status berhasil diubah menjadi Dipanggil.', 'success');
+                            searchButton.click();
+
+                        } catch (error) {
+                            showFeedbackMessage('Gagal mengubah status: ' + error.message, 'error');
+                            if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                                localStorage.removeItem('auth_token');
+                                localStorage.removeItem('user_role');
+                                localStorage.removeItem('user_name');
+                                alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                                window.location.href = 'login.html';
+                            }
+                        }
+                    });
+                });
+
+            } catch (error) {
+                loadingMessage.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Gagal memuat data pendaftaran: ' + error.message;
+                if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user_role');
                     localStorage.removeItem('user_name');
                     alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
                     window.location.href = 'login.html';
-                    }
                 }
-                });
-            });
-
-            } catch (error) {
-            loadingMessage.style.display = 'none';
-            errorMessage.style.display = 'block';
-            errorMessage.textContent = 'Gagal memuat data pendaftaran: ' + error.message;
-            if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user_role');
-                localStorage.removeItem('user_name');
-                alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
-                window.location.href = 'login.html';
-            }
             }
         });
 
         searchInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-            // Sembunyikan data sebelumnya sebelum pencarian baru
-            pendaftaranTableBody.innerHTML = '';
-            const query = searchInput.value.trim();
-            loadPendaftarans(query);
+                pendaftaranTableBody.innerHTML = '';
+                const query = searchInput.value.trim();
+                loadPendaftarans(query);
             }
         });
 
-
         document.addEventListener('DOMContentLoaded', loadPendaftarans);
-
 
         // --- Kode untuk sidebar dan popup profil yang sudah ada ---
         let arrow = document.querySelectorAll(".arrow");
