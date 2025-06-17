@@ -167,11 +167,22 @@
                     <a href="index-layanan_dokter.html"><img src="image/arrow-right.svg" alt=""></a>
                 </div>
             </div>
+            <div class="card-2">
+                <div class="icon-case">
+                    <img src="image/icon_dokter.png" alt="icon_perawat">
+                </div>
+                <div class="box-2">
+                    <h4>Perawat</h4>
+                    <h4 class="jumlah" id="perawatCount">0</h4> </div>
+                <div class="arrow">
+                    <a href="index-layanan_perawat.html"><img src="image/arrow-right.svg" alt=""></a>
+                </div>
+            </div>
         </div>
     </main>
 
     <script>
-        const BASE_API_URL = 'https://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
 
         // --- Proteksi Halaman Dashboard ---
         const authToken = localStorage.getItem('auth_token');
@@ -240,6 +251,7 @@
             document.getElementById('pasienCount').textContent = 'Memuat...';
             document.getElementById('poliCount').textContent = 'Memuat...';
             document.getElementById('dokterCount').textContent = 'Memuat...';
+            document.getElementById('perawatCount').textContent = 'Memuat...';
 
             try {
                 const response = await fetch(`${BASE_API_URL}/dashboard/counts`, {
@@ -263,6 +275,7 @@
                 document.getElementById('pasienCount').textContent = data.pasien_count || 0;
                 document.getElementById('poliCount').textContent = data.poli_count || 0;
                 document.getElementById('dokterCount').textContent = data.dokter_count || 0;
+                document.getElementById('perawatCount').textContent = data.perawat_count || 0;
 
             } catch (error) {
                 console.error('Error mengambil data dashboard:', error);
@@ -271,6 +284,7 @@
                 document.getElementById('pasienCount').textContent = 'Error';
                 document.getElementById('poliCount').textContent = 'Error';
                 document.getElementById('dokterCount').textContent = 'Error';
+                document.getElementById('perawatCount').textContent = 'Error';
                 alert('Gagal memuat data dashboard: ' + error.message);
                 // Opsional: Redirect ke login jika token tidak valid/kadaluarsa
                 if (error.message.includes('Unauthenticated')) { // Sesuaikan pesan error dari Laravel
