@@ -360,13 +360,21 @@ main .cards-2 {
     padding-top: 20px;
     display: flex;
     align-items: center;
-    /* atau center, tergantung preferensi */
     justify-content: space-between;
     gap: 20px;
     flex-wrap: wrap;
+    flex-direction: column;
 }
 
-main .cards-2 .card-2 {
+.cards-2 .top-cards,
+.cards-2 .bottom-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.cards-2 .top-cards .card-2,
+.cards-2 .bottom-cards .card-2 {
     flex: 1;
     height: 100px;
     width: 320px;
