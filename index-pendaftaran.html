@@ -363,13 +363,14 @@
 
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeDetailModal()">Tutup</button>
+                <button class="btn-print" id="printButton"><img src="image/printer.svg" alt="">Cetak</button>
             </div>
         </div>
     </div>
 
 
     <script>
-        const BASE_API_URL = 'https://nazarfadil.me/api'; // Sesuaikan dengan URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Sesuaikan dengan URL Laravel Anda
 
         // --- Elemen HTML yang akan dimanipulasi ---
         const pendaftaranTableBody = document.getElementById('pendaftaranTableBody');
@@ -394,6 +395,7 @@
         const detailPoli = document.getElementById('detail_poli');
         const detailDokter = document.getElementById('detail_dokter');
         const detailStatus = document.getElementById('detail_status');
+        const printButton = document.getElementById('printButton');
 
 
         // --- Proteksi Halaman & Data User ---
@@ -464,7 +466,7 @@
             errorMessage.style.display = 'none';
             noDataMessage.style.display = 'none';
             pendaftaranTableBody.innerHTML = '';
-            let url = new URL(`${BASE_API_URL}/pendaftarans`);
+            let url = new URL(`${BASE_API_URL}/pendaftaran`);
             // Jika backend mendukung parameter 'status_not' untuk mengecualikan status tertentu, gunakan ini.
             // Misalnya: url.searchParams.append('status_not', '3');
             // Jika tidak, kita akan filter di sisi klien.
@@ -539,7 +541,7 @@
                             return;
                         }
                         try {
-                            const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                            const response = await fetch(`${BASE_API_URL}/pendaftaran/${id}`, {
                                 method: 'PUT', // Atau PATCH, tergantung API Anda
                                 headers: {
                                     'Accept': 'application/json',
@@ -589,7 +591,7 @@
         // --- Fungsionalitas Modal Detail ---
         async function openDetailModal(id) {
             try {
-                const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                const response = await fetch(`${BASE_API_URL}/pendaftaran/${id}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -639,6 +641,12 @@
             modalDetail.style.display = 'none';
         }
 
+        // Fungsionalitas tombol cetak (placeholder)
+        printButton.addEventListener('click', () => {
+            alert('Fungsionalitas cetak belum diimplementasikan.');
+            // Anda bisa mengimplementasikan window.print() atau logic cetak lainnya di sini
+        });
+
 
         // --- Fungsionalitas Pencarian ---
         searchButton.addEventListener('click', async () => {
@@ -655,7 +663,7 @@
             }
 
             try {
-            const url = new URL(`${BASE_API_URL}/pendaftarans`);
+            const url = new URL(`${BASE_API_URL}/pendaftaran`);
             url.searchParams.append('search', query);
 
             const response = await fetch(url.toString(), {
@@ -723,7 +731,7 @@
                     return;
                 }
                 try {
-                    const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                    const response = await fetch(`${BASE_API_URL}/pendaftaran/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',

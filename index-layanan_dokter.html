@@ -264,7 +264,7 @@
     </main>
 
     <script>
-        const BASE_API_URL = 'https://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
 
         // --- Elemen HTML yang akan dimanipulasi ---
         const dokterTableBody = document.getElementById('dokterTableBody');
@@ -359,7 +359,7 @@
             noDataMessage.style.display = 'none'; // Sembunyikan pesan 'Tidak ada data'
             dokterTableBody.innerHTML = ''; // Kosongkan tabel sebelumnya
 
-            let url = `${BASE_API_URL}/dokters`; // Endpoint API untuk mendapatkan data dokter
+            let url = `${BASE_API_URL}/dokter`; // Endpoint API untuk mendapatkan data dokter
             if (searchQuery) {
                 url += `?search=${encodeURIComponent(searchQuery)}`;
             }
@@ -443,7 +443,7 @@
         //         // Implementasi logika DELETE API di sini
         //         console.log('Menghapus dokter dengan ID:', dokterToDeleteId);
         //         try {
-        //             const response = await fetch(`${BASE_API_URL}/dokters/${dokterToDeleteId}`, {
+        //             const response = await fetch(`${BASE_API_URL}/dokter/${dokterToDeleteId}`, {
         //                 method: 'DELETE',
         //                 headers: {
         //                     'Accept': 'application/json',
@@ -482,7 +482,7 @@
             dokterTableBody.innerHTML = '';
 
             try {
-            const url = new URL(`${BASE_API_URL}/dokters`);
+            const url = new URL(`${BASE_API_URL}/dokter`);
             url.searchParams.append('search', query);
 
             const response = await fetch(url.toString(), {

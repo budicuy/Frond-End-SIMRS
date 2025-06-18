@@ -205,7 +205,7 @@
 
 
     <script>
-        const BASE_API_URL = 'https://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
 
         // --- Elemen HTML yang akan dimanipulasi ---
         const loadingMessage = document.getElementById('loadingMessage');
@@ -305,7 +305,7 @@
             }
 
             try {
-                const response = await fetch(`${BASE_API_URL}/pasiens/${rm}`, { // Endpoint API untuk detail pasien
+                const response = await fetch(`${BASE_API_URL}/pasien/${rm}`, { // Endpoint API untuk detail pasien
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -333,19 +333,19 @@
                 inputNamaPasien.value = pasien.nama_pasien;
                 // Mapping kode kabupaten ke nama kabupaten
                 const kabupatenMap = {
-                    "1": "Banjar",
-                    "2": "Barito Kuala",
-                    "3": "Tapin",
-                    "4": "Hulu Sungai Selatan",
-                    "5": "Hulu Sungai Tengah",
-                    "6": "Hulu Sungai Utara",
-                    "7": "Tabalong",
-                    "8": "Tanah Laut",
-                    "9": "Tanah Bumbu",
-                    "10": "Balangan",
-                    "11": "Kotabaru",
-                    "12": "Banjarmasin (Kota)",
-                    "13": "Banjarbaru (Kota)"
+                    "Banjar": "Banjar",
+                    "Barito Kuala": "Barito Kuala",
+                    "Tapin": "Tapin",
+                    "Hulu Sungai Selatan": "Hulu Sungai Selatan",
+                    "Hulu Sungai Tengah": "Hulu Sungai Tengah",
+                    "Hulu Sungai Utara": "Hulu Sungai Utara",
+                    "Tabalong": "Tabalong",
+                    "Tanah Laut": "Tanah Laut",
+                    "Tanah Bumbu": "Tanah Bumbu",
+                    "Balangan": "Balangan",
+                    "Kotabaru": "Kotabaru",
+                    "Banjarmasin (Kota)": "Banjarmasin (Kota)",
+                    "Banjarbaru (Kota)": "Banjarbaru (Kota)"
                 };
                 const inputKabupaten = document.getElementById('kabupaten');
                 inputKabupaten.value = kabupatenMap[pasien.kabupaten] || 'N/A';
@@ -354,13 +354,13 @@
                 // Ganti inputAgama menjadi select dan mapping kode agama ke nama agama
                 const inputAgama = document.getElementById('agama');
                 const agamaMap = {
-                    "1": "Islam",
-                    "2": "Kristen",
-                    "3": "Katolik",
-                    "4": "Hindu",
-                    "5": "Buddha",
-                    "6": "Konghucu",
-                    "7": "Lainnya"
+                    "Islam": "Islam",
+                    "Kristen": "Kristen",
+                    "Katolik": "Katolik",
+                    "Hindu": "Hindu",
+                    "Buddha": "Buddha",
+                    "Konghucu": "Konghucu",
+                    "Lainnya": "Lainnya"
                 };
                 inputAgama.value = agamaMap[pasien.agama] || 'N/A';
                 inputAgama.disabled = true;

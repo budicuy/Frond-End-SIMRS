@@ -183,13 +183,14 @@
 
             <div class="modal-footer">
                 <button class="btn-cancel" onclick="closeDetailModal()">Tutup</button>
+                <button class="btn-print" id="printButton"><img src="image/printer.svg" alt="">Cetak</button>
             </div>
         </div>
     </div>
 
 
     <script>
-        const BASE_API_URL = 'https://nazarfadil.me/api';
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api';
         const pendaftaranTableBody = document.getElementById('pendaftaranTableBody');
         const loadingMessage = document.getElementById('loadingMessage');
         const errorMessage = document.getElementById('errorMessage');
@@ -211,6 +212,7 @@
         const detailPoli = document.getElementById('detail_poli');
         const detailDokter = document.getElementById('detail_dokter');
         const detailStatus = document.getElementById('detail_status');
+        const printButton = document.getElementById('printButton');
 
 
         const authToken = localStorage.getItem('auth_token');
@@ -277,7 +279,7 @@
             errorMessage.style.display = 'none';
             noDataMessage.style.display = 'none';
             pendaftaranTableBody.innerHTML = '';
-            let url = new URL(`${BASE_API_URL}/pendaftarans`);
+            let url = new URL(`${BASE_API_URL}/pendaftaran`);
             url.searchParams.append('status', '3'); // Hanya ambil data dengan status 3 (Selesai)
 
             if (searchQuery) {
@@ -353,7 +355,7 @@
         }
         async function openDetailModal(id) {
             try {
-                const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                const response = await fetch(`${BASE_API_URL}/pendaftaran/${id}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -404,7 +406,9 @@
             modalDetail.style.display = 'none';
         }
 
-        
+        printButton.addEventListener('click', () => {
+            alert('Fungsionalitas cetak belum diimplementasikan.');
+        });
 
         searchButton.addEventListener('click', async () => {
             const query = searchInput.value.trim();
@@ -419,7 +423,7 @@
             pendaftaranTableBody.innerHTML = '';
 
             try {
-                const url = new URL(`${BASE_API_URL}/pendaftarans`);
+                const url = new URL(`${BASE_API_URL}/pendaftaran`);
                 url.searchParams.append('search', query);
 
                 const response = await fetch(url.toString(), {
@@ -487,7 +491,7 @@
                             return;
                         }
                         try {
-                            const response = await fetch(`${BASE_API_URL}/pendaftarans/${id}`, {
+                            const response = await fetch(`${BASE_API_URL}/pendaftaran/${id}`, {
                                 method: 'PUT',
                                 headers: {
                                     'Accept': 'application/json',

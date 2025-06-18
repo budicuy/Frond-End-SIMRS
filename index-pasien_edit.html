@@ -219,32 +219,32 @@
                         <label for="kabupaten">Kabupaten</label>
                         <select id="kabupaten" name="kabupaten" required>
                             <option value="">-- Pilih Kabupaten --</option>
-                            <option value="1">Banjar</option>
-                            <option value="2">Barito Kuala</option>
-                            <option value="3">Tapin</option>
-                            <option value="4">Hulu Sungai Selatan</option>
-                            <option value="5">Hulu Sungai Tengah</option>
-                            <option value="6">Hulu Sungai Utara</option>
-                            <option value="7">Tabalong</option>
-                            <option value="8">Tanah Laut</option>
-                            <option value="9">Tanah Bumbu</option>
-                            <option value="10">Balangan</option>
-                            <option value="11">Kotabaru</option>
-                            <option value="12">Banjarmasin (Kota)</option>
-                            <option value="13">Banjarbaru (Kota)</option>
+                            <option value="Banjar">Banjar</option>
+                            <option value="Barito Kuala">Barito Kuala</option>
+                            <option value="Tapin">Tapin</option>
+                            <option value="Hulu Sungai Selatan">Hulu Sungai Selatan</option>
+                            <option value="Hulu Sungai Tengah">Hulu Sungai Tengah</option>
+                            <option value="Hulu Sungai Utara">Hulu Sungai Utara</option>
+                            <option value="Tabalong">Tabalong</option>
+                            <option value="Tanah Laut">Tanah Laut</option>
+                            <option value="Tanah Bumbu">Tanah Bumbu</option>
+                            <option value="Balangan">Balangan</option>
+                            <option value="Kotabaru">Kotabaru</option>
+                            <option value="Banjarmasin (Kota)">Banjarmasin (Kota)</option>
+                            <option value="Banjarbaru (Kota)">Banjarbaru (Kota)</option>
                         </select>
                     </div>                    
                     <div class="form-group">
                         <label for="agama">Agama</label>
                         <select id="agama" name="agama" required>
                             <option value="">-- Pilih --</option>
-                            <option value="1">Islam</option>
-                            <option value="2">Kristen</option>
-                            <option value="3">Katolik</option>
-                            <option value="4">Hindu</option>
-                            <option value="5">Buddha</option>
-                            <option value="6">Konghucu</option>
-                            <option value="7">Lainnya</option>
+                            <option value="Islam">Islam</option>
+                            <option value="Kristen">Kristen</option>
+                            <option value="Katolik">Katolik</option>
+                            <option value="Hindu">Hindu</option>
+                            <option value="Buddha">Buddha</option>
+                            <option value="Konghucu">Konghucu</option>
+                            <option value="Lainnya">Lainnya</option>
                         </select>
                     </div>                    
                     <div class="form-group">
@@ -326,7 +326,7 @@
 
 
     <script>
-        const BASE_API_URL = 'https://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
 
         // --- Elemen HTML yang akan dimanipulasi ---
         const loadingMessage = document.getElementById('loadingMessage');
@@ -456,7 +456,7 @@
             }
 
             try {
-                const response = await fetch(`${BASE_API_URL}/pasiens/${currentRm}`, {
+                const response = await fetch(`${BASE_API_URL}/pasien/${currentRm}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -561,7 +561,7 @@
             console.log('Data yang akan dikirim untuk update:', data);
 
             try {
-                const response = await fetch(`${BASE_API_URL}/pasiens/${currentRm}`, { // Endpoint PUT/PATCH
+                const response = await fetch(`${BASE_API_URL}/pasien/${currentRm}`, { // Endpoint PUT/PATCH
                     method: 'PUT', // Menggunakan PUT untuk update keseluruhan resource
                     headers: {
                         'Content-Type': 'application/json',

@@ -246,7 +246,7 @@
 
                             try {
                                 // Endpoint backend harus mengembalikan nomor antrian tertinggi untuk poli & tanggal
-                                const response = await fetch(`${BASE_API_URL}/pendaftarans/max-antrian?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`, {
+                                const response = await fetch(`${BASE_API_URL}/pendaftaran/max-antrian?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`, {
                                     method: 'GET',
                                     headers: {
                                         'Accept': 'application/json',
@@ -294,7 +294,7 @@
     </main>
 
     <script>
-        const BASE_API_URL = 'https://nazarfadil.me/api'; // Pastikan sesuai URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
 
         // --- Elemen HTML yang akan dimanipulasi ---
         const responseMessage = document.getElementById('responseMessage'); // Mengganti feedbackMessage
@@ -394,7 +394,7 @@
             poliSelect.innerHTML = '<option value="">Memuat Poli...</option>';
             poliSelect.disabled = true;
             try {
-                const response = await fetch(`${BASE_API_URL}/polis`, {
+                const response = await fetch(`${BASE_API_URL}/poli`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -428,7 +428,7 @@
             dokterSelect.innerHTML = '<option value="">Memuat Dokter...</option>';
             dokterSelect.disabled = true;
             try {
-                const response = await fetch(`${BASE_API_URL}/dokters`, {
+                const response = await fetch(`${BASE_API_URL}/dokter`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -499,7 +499,7 @@ function filterDoktersByPoli() {
             }
 
             try {
-                const response = await fetch(`${BASE_API_URL}/pasiens/${rm}`, {
+                const response = await fetch(`${BASE_API_URL}/pasien/${rm}`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
@@ -530,6 +530,30 @@ function filterDoktersByPoli() {
                 showFeedbackMessage('Gagal mencari pasien: ' + error.message, 'error');
             }
         });
+        async function fetchNextNoAntrian() {
+            const id_poli = poliSelect.value;
+            const tgl_kunjungan = tanggalInput.value;
+            noAntrianInput.value = '';
+            noAntrianInput.disabled = true;
+
+            if (!id_poli || !tgl_kunjungan) return;
+
+            noAntrianInput.placeholder = "Memuat...";
+            try {
+                // Asumsi ada endpoint untuk ini
+                const response = await fetch(`${BASE_API_URL}/pendaftaran/max-antrian?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`, { headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${authToken}` } });
+                if (!response.ok) throw new Error('Gagal mengambil nomor antrian.');
+                const result = await response.json();
+                const nextNo = (result.max_no_antrian || 0) + 1;
+                noAntrianInput.value = nextNo;
+                noAntrianInput.disabled = false;
+            } catch (error) {
+                showFeedback(error.message, 'error');
+                noAntrianInput.value = 1; // Fallback ke 1 jika gagal
+                noAntrianInput.disabled = false;
+                noAntrianInput.placeholder = "";
+            }
+        }
 
         // --- Event Listener untuk Submit Form Pendaftaran ---
         kunjunganForm.addEventListener('submit', async (e) => {
@@ -561,7 +585,7 @@ function filterDoktersByPoli() {
             }
 
             try {
-                const response = await fetch(`${BASE_API_URL}/pendaftarans`, {
+                const response = await fetch(`${BASE_API_URL}/pendaftaran`, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',

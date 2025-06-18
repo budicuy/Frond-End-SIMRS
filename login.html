@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
 
-<head>    
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Rumah Sakit Islam Banjarmasin</title>
     <link rel="stylesheet" href="style/login.css">
-    <link rel="icon" href="/image/logo_rs.png" type="image/png">
+    <link rel="icon" href="../frontend/image/logo_rs.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         
@@ -16,7 +16,7 @@
 <body>
     <header>
         <div class="header-container">
-            <img src="/image/logo_rs.png" alt="Logo Rumah Sakit" class="logo">
+            <img src="../frontend/image/logo_rs.png" alt="Logo Rumah Sakit" class="logo">
             <h1>RUMAH SAKIT ISLAM BANJARMASIN</h1>
         </div>
     </header>
@@ -27,13 +27,13 @@
             <form id="loginForm">
                 <label for="email">Email</label>
                 <div class="input-group">
-                    <img src="/image/profile.png" alt="icon Profile" class="icon">
+                    <img src="../frontend/image/profile.png" alt="icon Profile" class="icon">
                     <input type="email" id="email" placeholder="Masukkan Email Anda" required>
                 </div>
 
                 <label for="password">Kata Sandi</label>
                 <div class="input-group">
-                    <img src="/image/key.png" alt="Icon Sandi" class="icon">
+                    <img src="../frontend/image/key.png" alt="Icon Sandi" class="icon">
                     <input type="password" id="password" placeholder="Masukkan Kata Sandi Anda" required>
                 </div>
 
@@ -46,12 +46,12 @@
 
             <div id="messageArea" class="message" style="display: none;"></div>
 
-            <!-- <p class="register-text">Belum punya akun? <a href="daftar_akun.html">Daftar disini</a></p> -->
+            <p class="register-text">Belum punya akun? <a href="daftar_akun.html">Daftar disini</a></p>
         </div>
     </main>
 
     <script>
-        const BASE_API_URL = 'https://nazarfadil.me/api';
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api';
 
         const loginForm = document.getElementById('loginForm');
         const emailInput = document.getElementById('email');
@@ -80,8 +80,7 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer 123`
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ email, password })
                 });
@@ -91,7 +90,7 @@
                 if (response.ok) {
                     // Login berhasil!
                     const token = data.access_token;
-                    const userRole = data.user.roles; // Ambil role dari respons
+                    const userRole = data.user.role; // Ambil role dari respons
                     const userName = data.user.name;
 
                     showMessage(`Login berhasil! Selamat datang, ${userName} (${userRole}).`, 'success');
@@ -108,22 +107,22 @@
                     // Anda bisa menambahkan logika pengalihan di sini
                     // Pastikan userRole bertipe string untuk perbandingan yang konsisten
                     const roleStr = String(userRole);
-                    if (roleStr === 'admin') {
+                    if (roleStr === '1') {
                         window.location.href = 'index.html'; // Admin
-                    } else if (roleStr === 'super_admin' || roleStr === '1') {
-                        window.location.href = 'index.html'; // Admin pendaftaran
+                    } else if (roleStr === '2') {
+                        window.location.href = 'pendaftaran.html'; // Admin pendaftaran
                     } else if (roleStr === '3') {
                         window.location.href = 'https://ti054a02.agussbn.my.id'; // Dokter
                     } else if (roleStr === '4') {
-                        window.location.href = 'https://ti054a02.agussbn.my.id'; // Perawat
+                        window.location.href = 'https://ti054a03.agussbn.my.id'; // Perawat
                     } else if (roleStr === '5') {
-                        window.location.href = 'https://ti054a03.agussbn.my.id'; // Petugas Kasir
+                        window.location.href = 'kasir.html'; // Petugas Kasir
                     } else if (roleStr === '6') {
-                        window.location.href = 'https://ti054a03.agussbn.my.id'; // Admin Kasir
+                        window.location.href = 'admin_kasir.html'; // Admin Kasir
                     } else if (roleStr === '7') {
-                        window.location.href = 'https://ti054a04.agussbn.my.id'; // Petugas Apotik
+                        window.location.href = 'apotik.html'; // Petugas Apotik
                     } else if (roleStr === '8') {
-                        window.location.href = 'https://ti054a04.agussbn.my.id'; // Admin Apotik
+                        window.location.href = 'admin_apotik.html'; // Admin Apotik
                     } else {
                         showMessage('Role pengguna tidak dikenali. Silakan hubungi admin.', 'error');
                     }
