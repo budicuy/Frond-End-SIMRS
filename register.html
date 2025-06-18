@@ -34,6 +34,12 @@
                     <input type="email" id="email" placeholder="Masukkan Email Anda" required>
                 </div>
 
+                <label for="email_verified_at">Email Terverifikasi</label>
+                <div class="input-group">
+                    <img src="image/sms.svg" alt="icon Email Terverifikasi" class="icon">
+                    <input type="datetime-local" id="email_verified_at" required>
+                </div>
+
                 <!-- Password -->
                 <label for="password">Kata Sandi</label>
                 <div class="input-group">
@@ -82,6 +88,7 @@
             const nama = document.getElementById('nama').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const email_verified_at = document.getElementById('email_verified_at').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
             const role = document.getElementById('role').value;
 
@@ -101,6 +108,7 @@
                         name: nama,
                         email: email,
                         password: password,
+                        email_verified_at: email_verified_at,
                         password_confirmation: confirmPassword,
                         role: role
                     })
