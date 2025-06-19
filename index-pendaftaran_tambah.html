@@ -415,6 +415,7 @@
                     option.textContent = poli.nama_poli;
                     poliSelect.appendChild(option);
                 });
+                fetchNextNoAntrian(); // Panggil fungsi untuk mengambil nomor antrian setelah poli dimuat
                 poliSelect.disabled = false;
             } catch (error) {
                 console.error('Error loading polis:', error);
