@@ -468,10 +468,10 @@
             }
 
             try {
-                // PERUBAHAN 1: Menggunakan endpoint utama (/pendaftarans) dengan filter, bukan /max-antrian
-                const url = `${BASE_API_URL}/pendaftarans?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`;
-                
+                // Menggunakan endpoint max-antrian sesuai dokumentasi
+                const url = `${BASE_API_URL}/pendaftarans/max-antrian?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`;
                 const response = await fetch(url, {
+                    method: 'GET',
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${authToken}`
@@ -479,28 +479,20 @@
                 });
 
                 if (!response.ok) {
-                    // Pesan error ini sekarang lebih spesifik jika endpoint filter gagal
-                    throw new Error('Gagal memuat data pendaftaran yang ada.');
+                    throw new Error('Gagal memuat no antrian.');
                 }
 
                 const result = await response.json();
-                const pendaftaranList = result.data || [];
-
-                // PERUBAHAN 2: Menghitung nomor antrian tertinggi dari daftar yang diterima
-                let maxAntrian = 0;
-                if (pendaftaranList.length > 0) {
-                    // Ambil semua no_antrian, ubah ke angka, dan cari yang terbesar
-                    maxAntrian = Math.max(...pendaftaranList.map(p => Number(p.no_antrian)));
+                // Jika data null, berarti belum ada antrian hari itu
+                let nextNo = 1;
+                if (result.data && result.data.max_antrian) {
+                    nextNo = Number(result.data.max_antrian) + 1;
                 }
-
-                // Nomor antrian baru adalah nomor tertinggi + 1
-                const nextNo = maxAntrian + 1;
                 
                 noAntrianInput.value = nextNo;
                 noAntrianInput.disabled = false;
 
             } catch (error) {
-                // Jika terjadi error, fallback ke nomor 1 agar user tetap bisa input manual
                 showFeedbackMessage(error.message, 'error');
                 noAntrianInput.value = 1; 
                 noAntrianInput.disabled = false;
