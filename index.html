@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="style/style.css">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
-        /* Beberapa styling dasar untuk loader dan pesan, bisa dipindahkan ke style.css */
         .loading-text {
             color: #666;
             font-style: italic;
@@ -94,7 +93,6 @@
             <div class="profile-trigger" onclick="toggleProfilePopup()">
                 <img src="image/admin.svg" alt="User" class="profile-icon">
             </div>
-
             <div id="profile-popup" class="profile-popup hidden">
                 <div class="popup-content">
                     <img src="image/admin.svg" alt="User" class="popup-icon">
@@ -167,6 +165,9 @@
                         <a href="index-layanan.html"><img src="image/arrow-right.svg" alt=""></a>
                     </div>
                 </div>
+            </div>
+            <!-- Baris kedua -->
+            <div class="bottom-cards">
                 <div class="card-2">
                     <!-- Dokter -->
                     <div class="icon-case">
@@ -303,7 +304,7 @@
                 document.getElementById('perawatCount').textContent = 'Error';
                 alert('Gagal memuat data dashboard: ' + error.message);
                 // Opsional: Redirect ke login jika token tidak valid/kadaluarsa
-                if (error.message.includes('Unauthenticated')) { // Sesuaikan pesan error dari Laravel
+                if (error.message.includes('Unauthenticated')) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user_role');
                     localStorage.removeItem('user_name');
@@ -312,10 +313,8 @@
             }
         }
 
-        // Panggil fungsi untuk mengambil data saat halaman dimuat
         document.addEventListener('DOMContentLoaded', fetchDashboardCounts);
 
-        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
         let arrow = document.querySelectorAll(".arrow");
         for (var i = 0; i < arrow.length; i++) {
             arrow[i].addEventListener("click", (e) => {

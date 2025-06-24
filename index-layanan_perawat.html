@@ -12,48 +12,50 @@
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <style>
-        /* Gaya tambahan untuk pesan feedback */
         .feedback-message {
             margin-top: 20px;
             padding: 10px 15px;
             border-radius: 5px;
             font-weight: bold;
             text-align: center;
-            display: none; /* Default hidden */
+            display: none;
         }
+
         .feedback-message.success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
         .feedback-message.error {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
         .info-message {
             text-align: center;
             padding: 20px;
             font-size: 1.1em;
             color: #555;
         }
+
         .error-message {
             color: red;
             font-weight: bold;
         }
 
-        /* Styling for table actions */
         .aksi {
-            width: 20px; /* Adjust as needed */
-            height: 20px; /* Adjust as needed */
+            width: 20px;
+            height: 20px;
             vertical-align: middle;
             margin: 0 3px;
         }
+
         td .aksi {
             cursor: pointer;
         }
 
-        /* Styling for modal (popup) */
         .popup {
             position: fixed;
             top: 0;
@@ -93,7 +95,8 @@
             gap: 15px;
         }
 
-        .btn-cancel, .btn-delete {
+        .btn-cancel,
+        .btn-delete {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -120,7 +123,6 @@
             background-color: #c82333;
         }
 
-        /* Tambahkan style untuk pesan loading agar ada tempatnya */
         .loading-message {
             text-align: center;
             padding: 20px;
@@ -218,11 +220,13 @@
     </section>
     <main>
         <div class="main-content">
+            <h3>Daftar Poli</h3>
         </div>
         <div class="card">
             <div class="content-header">
                 <h3>
-                    <a href="index-layanan_perawat.html" class="sub-link" style="color: #000; text-decoration: none;">Data Perawat</a>
+                    <a href="index-layanan_perawat.html" class="sub-link"
+                        style="color: #000; text-decoration: none; display: none;">Data Perawat</a>
                 </h3>
             </div>
             <div id="loadingMessage" class="loading-message">Memuat data perawat...</div>
@@ -232,13 +236,12 @@
             <div class="top-bar">
                 <div class="left-group">
                     <div class="search-group">
-                        <input type="text" placeholder="Cari berdasarkan Nama Perawat" id="searchInput" />
+                        <input type="text" placeholder="Cari berdasarkan Nama Perawat" id="searchInput">
                         <button class="search-btn" id="searchButton"><i class="bx bx-search"></i></button>
                     </div>
                 </div>
                 <button class="filter-btn" style="display: none;"><img src="image/Input.svg" alt=""></button>
             </div>
-
 
             <div class="table-container">
                 <table>
@@ -248,47 +251,37 @@
                             <th>ID Perawat</th>
                             <th>Nama Perawat</th>
                             <th>No Handphone</th>
-                            </tr>
+                        </tr>
                     </thead>
                     <tbody id="perawatTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
             <div id="noDataMessage" class="info-message" style="display: none;">Tidak ada data perawat.</div>
 
-            <div class="pagination-wrapper" style="display: none;">
-                <div class="pagination-center">Halaman 1/1</div>
-                <a href="#" class="pagination-next"><img src="image/hal-lanjut.svg" alt=""></a>
+            <div class="pagination-wrapper">
+                <div class="pagination-center" id="paginationInfo">Total:</div>
             </div>
         </div>
     </main>
 
     <script>
-        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
+        // BASE_API_URL dan endpoint pengambilan data TIDAK diubah sesuai permintaan Anda!
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api';
 
-        // --- Elemen HTML yang akan dimanipulasi ---
         const perawatTableBody = document.getElementById('perawatTableBody');
         const loadingMessage = document.getElementById('loadingMessage');
         const errorMessage = document.getElementById('errorMessage');
         const noDataMessage = document.getElementById('noDataMessage');
-        const feedbackMessage = document.getElementById('feedbackMessage'); // Untuk pesan sukses/error
-
-        // Karena modal delete tidak ada di HTML yang Anda berikan,
-        // saya akan komentar atau biarkan undefined.
-        // Jika Anda tambahkan, uncomment dan sesuaikan ID-nya.
-        // const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
-        // const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-        // const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-
+        const feedbackMessage = document.getElementById('feedbackMessage');
         const searchInput = document.getElementById('searchInput');
         const searchButton = document.getElementById('searchButton');
-
-
+        const paginationInfo = document.getElementById('paginationInfo');
         const userNameDisplay = document.getElementById('userNameDisplay');
         const userRoleDisplay = document.getElementById('userRoleDisplay');
         const logoutButton = document.getElementById('logoutButton');
 
-        let perawatToDeleteId = null; // Variabel untuk menyimpan ID perawat yang akan dihapus
+        let perawatToDeleteId = null;
 
         // --- Proteksi Halaman & Data User ---
         const authToken = localStorage.getItem('auth_token');
@@ -342,7 +335,6 @@
             }
         });
 
-        // --- Fungsi untuk Menampilkan Pesan Feedback (Sukses/Error) ---
         function showFeedbackMessage(message, type) {
             feedbackMessage.textContent = message;
             feedbackMessage.className = `feedback-message ${type}`;
@@ -352,14 +344,13 @@
             }, 5000);
         }
 
-        // --- Fungsi untuk Memuat Data Perawat ---
         async function loadPerawats(searchQuery = '') {
-            loadingMessage.style.display = 'block'; // Tampilkan pesan loading
-            errorMessage.style.display = 'none'; // Sembunyikan pesan error
-            noDataMessage.style.display = 'none'; // Sembunyikan pesan 'Tidak ada data'
-            perawatTableBody.innerHTML = ''; // Kosongkan tabel sebelumnya
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            noDataMessage.style.display = 'none';
+            perawatTableBody.innerHTML = '';
 
-            let url = `${BASE_API_URL}/perawat`; // Endpoint API untuk mendapatkan data perawat
+            let url = `${BASE_API_URL}/perawat`;
             if (searchQuery) {
                 url += `?search=${encodeURIComponent(searchQuery)}`;
             }
@@ -374,56 +365,37 @@
                 });
 
                 if (!response.ok) {
-                    const errorDetails = await response.json(); // Coba parse error response
+                    const errorDetails = await response.json();
                     throw new Error(errorDetails.message || `Gagal memuat data perawat: ${response.statusText}`);
                 }
 
                 const result = await response.json();
-                console.log('Response API Perawat:', result); // Penting untuk debugging
-
-                // Perhatikan: Pastikan `result.data` adalah array.
-                // Jika API Anda langsung mengembalikan array tanpa "data" key,
-                // maka cukup gunakan `const perawats = result;`
                 const perawats = Array.isArray(result.data) ? result.data : [];
 
-                loadingMessage.style.display = 'none'; // Sembunyikan pesan loading
+                loadingMessage.style.display = 'none';
 
                 if (perawats.length === 0) {
-                    noDataMessage.style.display = 'block'; // Tampilkan pesan 'Tidak ada data'
+                    noDataMessage.style.display = 'block';
+                    paginationInfo.textContent = 'Total: 0';
                     return;
                 }
 
                 perawats.forEach((perawat, index) => {
-                    const row = document.createElement('tr'); // Gunakan createElement
+                    const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${index + 1}</td>
                         <td>${perawat.id_perawat}</td>
                         <td>${perawat.nama_perawat}</td>
                         <td>${perawat.no_hp_perawat || '-'}</td>
-                        <td>
-                            </td>
                     `;
-                    perawatTableBody.appendChild(row); // Tambahkan baris ke tbody
+                    perawatTableBody.appendChild(row);
                 });
 
-                // Tambahkan event listener untuk tombol hapus jika ada modalnya
-                // if (deleteConfirmationModal) { // Cek keberadaan modal
-                //     document.querySelectorAll('.delete-btn').forEach(button => {
-                //         button.addEventListener('click', (event) => {
-                //             event.preventDefault();
-                //             perawatToDeleteId = event.target.closest('.delete-btn').dataset.id;
-                //             deleteConfirmationModal.style.display = 'flex';
-                //         });
-                //     });
-                // }
-
+                paginationInfo.textContent = `Total: ${perawats.length}`;
             } catch (error) {
-                loadingMessage.style.display = 'none'; // Sembunyikan loading jika ada error
+                loadingMessage.style.display = 'none';
                 errorMessage.style.display = 'block';
                 errorMessage.textContent = 'Gagal memuat data perawat: ' + error.message;
-                console.error('Error fetching perawats data:', error);
-
-                // Tangani error otentikasi
                 if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user_role');
@@ -434,123 +406,20 @@
             }
         }
 
-        // --- Fungsionalitas Hapus Perawat (Jika ada modal) ---
-        // Karena modal delete tidak ada di HTML Anda, bagian ini akan diabaikan.
-        // Jika Anda menambahkan modal, pastikan ID elemennya sesuai dan uncomment kode ini.
-        // if (cancelDeleteBtn && confirmDeleteBtn) {
-        //     cancelDeleteBtn.addEventListener('click', () => {
-        //         // deleteConfirmationModal.style.display = 'none';
-        //         perawatToDeleteId = null;
-        //     });
-        //     confirmDeleteBtn.addEventListener('click', async () => {
-        //         // Implementasi logika DELETE API di sini
-        //         console.log('Menghapus perawat dengan ID:', perawatToDeleteId);
-        //         try {
-        //             const response = await fetch(`${BASE_API_URL}/perawat/${perawatToDeleteId}`, {
-        //                 method: 'DELETE',
-        //                 headers: {
-        //                     'Accept': 'application/json',
-        //                     'Authorization': `Bearer ${authToken}`
-        //                 }
-        //             });
-        //             if (response.ok) {
-        //                 showFeedbackMessage('Data perawat berhasil dihapus.', 'success');
-        //                 loadPerawats(); // Muat ulang data setelah hapus
-        //             } else {
-        //                 const errorData = await response.json();
-        //                 showFeedbackMessage(`Gagal menghapus perawat: ${errorData.message || response.statusText}`, 'error');
-        //             }
-        //         } catch (error) {
-        //             console.error('Error deleting perawat:', error);
-        //             showFeedbackMessage('Terjadi kesalahan saat menghapus perawat.', 'error');
-        //         } finally {
-        //             // deleteConfirmationModal.style.display = 'none';
-        //             perawatToDeleteId = null;
-        //         }
-        //     });
-        // }
-
-        // --- Fungsionalitas Pencarian ---
-        searchButton.addEventListener('click', async () => {
+        searchButton.addEventListener('click', () => {
             const query = searchInput.value.trim();
-            if (!query) {
-            loadPerawats('');
-            return;
-            }
-
-            loadingMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-            noDataMessage.style.display = 'none';
-            perawatTableBody.innerHTML = '';
-
-            try {
-            const url = new URL(`${BASE_API_URL}/perawat`);
-            url.searchParams.append('search', query);
-
-            const response = await fetch(url.toString(), {
-                method: 'GET',
-                headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-                }
-            });
-
-            if (!response.ok) {
-                const errorDetails = await response.json();
-                throw new Error(errorDetails.message || `Gagal memuat data perawat: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            // Filter hanya berdasarkan nama_perawat (case-insensitive)
-            const filtered = (result.data || []).filter(item =>
-                item.nama_perawat && item.nama_perawat.toLowerCase().includes(query.toLowerCase())
-            );
-
-            loadingMessage.style.display = 'none';
-
-            if (filtered.length === 0) {
-                noDataMessage.style.display = 'block';
-                noDataMessage.textContent = `Data Perawat "${query}" tidak ditemukan`;
-                return;
-            }
-
-            filtered.forEach((perawat, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${perawat.id_perawat}</td>
-                <td>${perawat.nama_perawat}</td>
-                <td>${perawat.no_hp_perawat || '-'}</td>
-                <td></td>
-                `;
-                perawatTableBody.appendChild(row);
-            });
-
-            } catch (error) {
-            loadingMessage.style.display = 'none';
-            errorMessage.style.display = 'block';
-            errorMessage.textContent = 'Gagal memuat data perawat: ' + error.message;
-            if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user_role');
-                localStorage.removeItem('user_name');
-                alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
-                window.location.href = 'login.html';
-            }
-            }
+            loadPerawats(query);
         });
 
         searchInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-            searchButton.click();
+                const query = searchInput.value.trim();
+                loadPerawats(query);
             }
         });
 
-
-        // Panggil fungsi untuk memuat data saat halaman dimuat
         document.addEventListener('DOMContentLoaded', loadPerawats);
 
-        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
         let arrow = document.querySelectorAll(".arrow");
         for (var i = 0; i < arrow.length; i++) {
             arrow[i].addEventListener("click", (e) => {
@@ -579,7 +448,6 @@
             }
         });
 
-        // Inisialisasi Date Range Picker (tetap ada jika suatu saat dibutuhkan)
         $(function () {
             $('#dateRange').daterangepicker({
                 opens: 'right',
@@ -588,8 +456,23 @@
                 }
             }, function (start, end) {
                 console.log("Dari:", start.format('YYYY-MM-DD'), "Sampai:", end.format('YYYY-MM-DD'));
-                // Kamu bisa trigger filter di sini jika diaktifkan
             });
+        });
+
+        // Filter baris tabel secara client-side (opsional, jika ingin filter cepat di tabel)
+        searchInput.addEventListener('keyup', function () {
+            const filter = searchInput.value.toLowerCase();
+            const rows = perawatTableBody.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                let idPerawat = rows[i].cells[1]?.textContent.toLowerCase() || '';
+                let namaPerawat = rows[i].cells[2]?.textContent.toLowerCase() || '';
+                let noHp = rows[i].cells[3]?.textContent.toLowerCase() || '';
+                if (idPerawat.includes(filter) || namaPerawat.includes(filter) || noHp.includes(filter)) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
         });
     </script>
 </body>

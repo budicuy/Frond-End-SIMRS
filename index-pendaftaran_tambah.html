@@ -201,7 +201,7 @@
                     <div class="form-group">
                         <label for="dokter_select">Dokter</label>
                         <select id="dokter_select" required disabled>
-                            <option value="">Memuat Dokter...</option>
+                            <option value="">Pilih Poli Terlebih Dahulu</option>
                         </select>
                     </div>
 
@@ -213,69 +213,12 @@
                         <label for="tanggal_input">Tanggal Kunjungan</label>
                         <input type="date" id="tanggal_input" required>
                     </div>
-                    <script>
-                        // Set default value tanggal_input ke hari ini
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const tanggalInput = document.getElementById('tanggal_input');
-                            if (tanggalInput) {
-                                const today = new Date();
-                                const yyyy = today.getFullYear();
-                                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                                const dd = String(today.getDate()).padStart(2, '0');
-                                tanggalInput.value = `${yyyy}-${mm}-${dd}`;
-                            }
-                        });
-                    </script>
+
                     <div class="form-group">
                         <label for="no_antrian_input">Nomor Antrian</label>
-                        <input type="number" id="no_antrian_input" required min="1">
+                        <input type="number" id="no_antrian_input" placeholder="Pilih poli dan tanggal" required min="1" disabled>
                     </div>
-                    <script>
-                        // Fungsi untuk mengambil nomor antrian tertinggi pada poli & tanggal yang dipilih
-                        async function fetchNextNoAntrian() {
-                            const id_poli = poliSelect.value;
-                            const tgl_kunjungan = tanggalInput.value;
-                            const noAntrianInput = document.getElementById('no_antrian_input');
-
-                            // Kosongkan jika poli/tanggal belum dipilih
-                            if (!id_poli || !tgl_kunjungan) {
-                                noAntrianInput.value = '';
-                                noAntrianInput.disabled = false;
-                                return;
-                            }
-
-                            try {
-                                // Endpoint backend harus mengembalikan nomor antrian tertinggi untuk poli & tanggal
-                                const response = await fetch(`${BASE_API_URL}/pendaftaran/max-antrian?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`, {
-                                    method: 'GET',
-                                    headers: {
-                                        'Accept': 'application/json',
-                                        'Authorization': `Bearer ${authToken}`
-                                    }
-                                });
-                                if (!response.ok) {
-                                    throw new Error('Gagal mengambil nomor antrian');
-                                }
-                                const result = await response.json();
-                                // Misal backend mengembalikan { max_no_antrian: 5 }
-                                const nextNo = (result.max_no_antrian ? parseInt(result.max_no_antrian) : 0) + 1;
-                                noAntrianInput.value = nextNo;
-                                noAntrianInput.disabled = false;
-                            } catch (error) {
-                                noAntrianInput.value = '';
-                                noAntrianInput.disabled = false;
-                                showFeedbackMessage('Gagal mengambil nomor antrian: ' + error.message, 'error');
-                            }
-                        }
-
-                        // Event: Setiap kali poli atau tanggal berubah, ambil nomor antrian otomatis
-                        poliSelect.addEventListener('change', fetchNextNoAntrian);
-                        tanggalInput.addEventListener('change', fetchNextNoAntrian);
-
-                        // Juga panggil saat halaman pertama kali load jika poli & tanggal sudah terisi
-                        document.addEventListener('DOMContentLoaded', fetchNextNoAntrian);
-                    </script>
-
+                    
                     <div class="form-actions full-width">
                         <button type="reset" class="btn btn-secondary">Reset</button>
                         <button type="submit" class="btn btn-primary" id="submitButton">Tambah Pendaftaran</button>
@@ -294,13 +237,13 @@
     </main>
 
     <script>
-        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api';
 
         // --- Elemen HTML yang akan dimanipulasi ---
-        const responseMessage = document.getElementById('responseMessage'); // Mengganti feedbackMessage
+        const responseMessage = document.getElementById('responseMessage');
         const kunjunganForm = document.getElementById('kunjunganForm');
         const submitButton = document.getElementById('submitButton');
-        const popupSuccess = document.getElementById('popupSuccess'); // Untuk popup sukses setelah submit form
+        const popupSuccess = document.getElementById('popupSuccess');
 
         const rmInput = document.getElementById('rm_input');
         const namaPasienInput = document.getElementById('namaPasien_input');
@@ -344,19 +287,14 @@
                         'Authorization': `Bearer ${authToken}`
                     }
                 });
-                if (response.ok) {
-                    console.log('Logout Sukses');
-                } else {
+                if (!response.ok) {
                     const errorData = await response.json();
                     console.error('Logout Gagal:', errorData.message || response.statusText);
                 }
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user_role');
-                localStorage.removeItem('user_name');
-                window.location.href = 'login.html';
             } catch (error) {
                 console.error('Error saat logout:', error);
                 alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
+            } finally {
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('user_role');
                 localStorage.removeItem('user_name');
@@ -366,26 +304,25 @@
 
         // --- Fungsi untuk Menampilkan Pesan Feedback (Sukses/Error) ---
         function showFeedbackMessage(message, type) {
-            responseMessage.innerHTML = message; // Use innerHTML to support <br>
-            responseMessage.className = `message-container ${type}`; // Use message-container
+            responseMessage.innerHTML = message;
+            responseMessage.className = `message-container ${type}`;
             responseMessage.style.display = 'block';
             setTimeout(() => {
                 responseMessage.style.display = 'none';
-            }, 5000); // Tampilkan 5 detik
+            }, 5000);
         }
 
         // --- Fungsi untuk Menampilkan Popup Sukses (setelah submit) ---
         function showSuccessPopup(message = 'Pendaftaran berhasil ditambahkan.') {
-            const popupMessageElement = popupSuccess.querySelector('p'); // Find the paragraph inside the popup
+            const popupMessageElement = popupSuccess.querySelector('p');
             if (popupMessageElement) {
                 popupMessageElement.textContent = message;
             }
             popupSuccess.style.display = 'flex';
             setTimeout(() => {
                 popupSuccess.style.display = 'none';
-                // Opsional: Arahkan ke halaman daftar pendaftaran setelah sukses
                 window.location.href = 'index-pendaftaran.html';
-            }, 2000); // Tampilkan 2 detik lalu redirect
+            }, 2000);
         }
 
 
@@ -402,8 +339,7 @@
                     }
                 });
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Gagal memuat daftar poli.');
+                    throw new Error('Gagal memuat daftar poli.');
                 }
                 const result = await response.json();
                 allPolis = Array.isArray(result.data) ? result.data : [];
@@ -415,7 +351,6 @@
                     option.textContent = poli.nama_poli;
                     poliSelect.appendChild(option);
                 });
-                fetchNextNoAntrian(); // Panggil fungsi untuk mengambil nomor antrian setelah poli dimuat
                 poliSelect.disabled = false;
             } catch (error) {
                 console.error('Error loading polis:', error);
@@ -437,15 +372,10 @@
                     }
                 });
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Gagal memuat daftar dokter.');
+                    throw new Error('Gagal memuat daftar dokter.');
                 }
                 const result = await response.json();
                 allDokters = Array.isArray(result.data) ? result.data : [];
-
-                dokterSelect.innerHTML = '<option value="">-- Pilih Dokter --</option>';
-                // Dokter di-enable setelah poli dipilih
-                // dokterSelect.disabled = false; // Ini akan dihandle oleh filterDoktersByPoli()
                 filterDoktersByPoli(); // Panggil filter setelah semua dokter dimuat
             } catch (error) {
                 console.error('Error loading dokters:', error);
@@ -455,49 +385,41 @@
         }
 
         // --- Fungsi untuk Filter Dokter berdasarkan Poli yang Dipilih ---
-        // Di file index-pendaftaran_tambah.html
-function filterDoktersByPoli() {
-    const selectedPoliId = poliSelect.value;
-    dokterSelect.innerHTML = '<option value="">-- Pilih Dokter --</option>';
-    dokterSelect.disabled = true;
+        function filterDoktersByPoli() {
+            const selectedPoliId = poliSelect.value;
+            dokterSelect.innerHTML = '<option value="">-- Pilih Dokter --</option>';
+            dokterSelect.disabled = true;
 
-    if (!selectedPoliId) {
-        return;
-    }
+            if (!selectedPoliId) {
+                dokterSelect.innerHTML = '<option value="">Pilih Poli Terlebih Dahulu</option>';
+                return;
+            }
 
-    // PERUBAHAN DI SINI: filter berdasarkan 'poli_ids' array
-    const filteredDokters = allDokters.filter(dokter =>
-        dokter.poli_ids && dokter.poli_ids.includes(parseInt(selectedPoliId)) // Pastikan selectedPoliId adalah integer
-    );
+            const filteredDokters = allDokters.filter(dokter =>
+                dokter.poli_ids && dokter.poli_ids.includes(parseInt(selectedPoliId))
+            );
 
-    if (filteredDokters.length === 0) {
-        dokterSelect.innerHTML = '<option value="">Tidak ada dokter di poli ini</option>';
-        return;
-    }
+            if (filteredDokters.length === 0) {
+                dokterSelect.innerHTML = '<option value="">Tidak ada dokter di poli ini</option>';
+                return;
+            }
 
-    filteredDokters.forEach(dokter => {
-        const option = document.createElement('option');
-        option.value = dokter.id_dokter;
-        option.textContent = dokter.nama_dokter;
-        dokterSelect.appendChild(option);
-    });
-    dokterSelect.disabled = false;
-}
-
-        // --- Event Listener untuk Perubahan Poli ---
-        poliSelect.addEventListener('change', filterDoktersByPoli);
+            filteredDokters.forEach(dokter => {
+                const option = document.createElement('option');
+                option.value = dokter.id_dokter;
+                option.textContent = dokter.nama_dokter;
+                dokterSelect.appendChild(option);
+            });
+            dokterSelect.disabled = false;
+        }
 
         // --- Event Listener untuk Input Rekam Medis (Autocomplete Pasien) ---
         rmInput.addEventListener('blur', async () => {
             const rm = rmInput.value.trim();
             namaPasienInput.value = '';
             nikInput.value = '';
-            // namaPasienInput.disabled = true; // Jangan disabled, biarkan tetap seperti biasa
-            // nikInput.disabled = true; // Jangan disabled, biarkan tetap seperti biasa
 
-            if (!rm) {
-                return;
-            }
+            if (!rm) return;
 
             try {
                 const response = await fetch(`${BASE_API_URL}/pasien/${rm}`, {
@@ -514,8 +436,7 @@ function filterDoktersByPoli() {
                 }
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.message || 'Gagal mencari pasien.');
+                    throw new Error('Gagal mencari pasien.');
                 }
 
                 const result = await response.json();
@@ -523,7 +444,6 @@ function filterDoktersByPoli() {
 
                 namaPasienInput.value = pasien.nama_pasien || '';
                 nikInput.value = pasien.nik || '';
-
                 showFeedbackMessage(`Pasien ${pasien.nama_pasien} ditemukan.`, 'success');
 
             } catch (error) {
@@ -531,31 +451,49 @@ function filterDoktersByPoli() {
                 showFeedbackMessage('Gagal mencari pasien: ' + error.message, 'error');
             }
         });
+
+        // --- PERBAIKAN: Fungsi tunggal untuk mengambil nomor antrian ---
         async function fetchNextNoAntrian() {
             const id_poli = poliSelect.value;
             const tgl_kunjungan = tanggalInput.value;
+            
             noAntrianInput.value = '';
             noAntrianInput.disabled = true;
-
-            if (!id_poli || !tgl_kunjungan) return;
-
             noAntrianInput.placeholder = "Memuat...";
+
+            if (!id_poli || !tgl_kunjungan) {
+                noAntrianInput.placeholder = "Pilih poli dan tanggal";
+                return;
+            }
+
             try {
-                // Asumsi ada endpoint untuk ini
-                const response = await fetch(`${BASE_API_URL}/pendaftaran/max-antrian?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`, { headers: { 'Accept': 'application/json', 'Authorization': `Bearer ${authToken}` } });
-                if (!response.ok) throw new Error('Gagal mengambil nomor antrian.');
+                // PERBAIKAN: Endpoint API disesuaikan dengan dokumentasi
+                const url = `${BASE_API_URL}/pendaftarans/max-antrian?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`;
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data antrian dari server.');
+                }
+
                 const result = await response.json();
                 const nextNo = (result.max_no_antrian || 0) + 1;
                 noAntrianInput.value = nextNo;
                 noAntrianInput.disabled = false;
+
             } catch (error) {
-                showFeedback(error.message, 'error');
+                // PERBAIKAN: Memanggil fungsi feedback yang benar
+                showFeedbackMessage(error.message, 'error');
                 noAntrianInput.value = 1; // Fallback ke 1 jika gagal
                 noAntrianInput.disabled = false;
                 noAntrianInput.placeholder = "";
             }
         }
-
+        
         // --- Event Listener untuk Submit Form Pendaftaran ---
         kunjunganForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -563,23 +501,24 @@ function filterDoktersByPoli() {
             submitButton.disabled = true;
             submitButton.textContent = 'Menyimpan...';
 
-            const rm = rmInput.value.trim();
-            const id_poli = poliSelect.value;
-            const id_dokter = dokterSelect.value; // Ini tidak dikirim ke Pendaftaran model
-            const tgl_kunjungan = tanggalInput.value;
-            const no_antrian = noAntrianInput.value;
-            const status = 0; // Status default 0 (Menunggu) seperti di backend
+            const formData = {
+                rm: rmInput.value.trim(),
+                id_poli: poliSelect.value,
+                id_dokter: dokterSelect.value, // disertakan untuk data lengkap
+                tgl_kunjungan: tanggalInput.value,
+                no_antrian: noAntrianInput.value,
+                status: 0, // Status default 0 (Menunggu)
+            };
 
-            if (!rm || !id_poli || !tgl_kunjungan || !no_antrian) {
+            if (!formData.rm || !formData.id_poli || !formData.id_dokter || !formData.tgl_kunjungan || !formData.no_antrian) {
                 showFeedbackMessage('Semua kolom wajib diisi!', 'error');
                 submitButton.disabled = false;
                 submitButton.textContent = 'Tambah Pendaftaran';
                 return;
             }
 
-            // Validasi tambahan: Pastikan pasien sudah ditemukan dan nama pasien terisi
             if (namaPasienInput.value === '' || nikInput.value === '') {
-                showFeedbackMessage('Rekam Medis tidak valid atau pasien belum ditemukan. Silakan cek RM kembali.', 'error');
+                showFeedbackMessage('Rekam Medis tidak valid. Pastikan data pasien sudah muncul.', 'error');
                 submitButton.disabled = false;
                 submitButton.textContent = 'Tambah Pendaftaran';
                 return;
@@ -593,38 +532,19 @@ function filterDoktersByPoli() {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${authToken}`
                     },
-                    body: JSON.stringify({
-                        rm: rm,
-                        id_poli: id_poli,
-                        tgl_kunjungan: tgl_kunjungan,
-                        status: status,
-                        no_antrian: no_antrian
-                    })
+                    body: JSON.stringify(formData) // Mengirim semua data
                 });
 
                 const result = await response.json();
 
                 if (response.ok) {
-                    showSuccessPopup(); // Menampilkan popup sukses
-                    kunjunganForm.reset();
-                    // Reset nama pasien dan NIK setelah form direset
-                    namaPasienInput.value = '';
-                    nikInput.value = '';
-                    // Muat ulang daftar poli/dokter jika perlu (misal: antrian baru)
-                    loadPolis();
-                    loadDokters();
+                    showSuccessPopup();
                 } else {
-                    let errorMessageText = 'Gagal menambahkan pendaftaran.';
-                    if (result.message) {
-                        errorMessageText += ` Pesan: ${result.message}`;
-                    }
+                    let errorMessageText = result.message || 'Gagal menambahkan pendaftaran.';
                     if (result.errors) {
-                        for (const key in result.errors) {
-                            errorMessageText += `<br>- ${result.errors[key].join(', ')}`;
-                        }
+                        errorMessageText += '<br>' + Object.values(result.errors).map(e => e.join(', ')).join('<br>');
                     }
                     showFeedbackMessage(errorMessageText, 'error');
-                    console.error('Error response:', result);
                 }
             } catch (error) {
                 console.error('Error submitting pendaftaran:', error);
@@ -634,24 +554,32 @@ function filterDoktersByPoli() {
                 submitButton.textContent = 'Tambah Pendaftaran';
             }
         });
+        
+        // --- Event Listeners untuk perubahan form ---
+        poliSelect.addEventListener('change', () => {
+            filterDoktersByPoli();
+            fetchNextNoAntrian();
+        });
+        tanggalInput.addEventListener('change', fetchNextNoAntrian);
+
 
         // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Set tanggal hari ini sebagai default di input tanggal
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set tanggal hari ini sebagai default
             const today = new Date();
             const yyyy = today.getFullYear();
             const mm = String(today.getMonth() + 1).padStart(2, '0');
             const dd = String(today.getDate()).padStart(2, '0');
             tanggalInput.value = `${yyyy}-${mm}-${dd}`;
 
-            // Panggil loadPolis dan loadDokters secara paralel
-            await Promise.all([
+            // Muat data yang diperlukan
+            Promise.all([
                 loadPolis(),
                 loadDokters()
             ]);
         });
 
-        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
+        // --- Kode untuk sidebar dan popup profil ---
         let arrow = document.querySelectorAll(".arrow");
         for (var i = 0; i < arrow.length; i++) {
             arrow[i].addEventListener("click", (e) => {
@@ -662,9 +590,11 @@ function filterDoktersByPoli() {
 
         let sidebar = document.querySelector(".sidebar");
         let sidebarBtn = document.querySelector(".bx-menu");
-        sidebarBtn.addEventListener("click", () => {
-            sidebar.classList.toggle("close");
-        });
+        if(sidebarBtn) {
+            sidebarBtn.addEventListener("click", () => {
+                sidebar.classList.toggle("close");
+            });
+        }
 
         function toggleProfilePopup() {
             const popup = document.getElementById("profile-popup");
@@ -675,7 +605,7 @@ function filterDoktersByPoli() {
             const trigger = document.querySelector(".profile-trigger");
             const popup = document.getElementById("profile-popup");
 
-            if (!trigger.contains(e.target) && !popup.contains(e.target)) {
+            if (trigger && !trigger.contains(e.target) && popup && !popup.contains(e.target)) {
                 popup.classList.add("hidden");
             }
         });

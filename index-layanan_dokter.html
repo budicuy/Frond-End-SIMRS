@@ -12,48 +12,50 @@
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <style>
-        /* Gaya tambahan untuk pesan feedback */
         .feedback-message {
             margin-top: 20px;
             padding: 10px 15px;
             border-radius: 5px;
             font-weight: bold;
             text-align: center;
-            display: none; /* Default hidden */
+            display: none;
         }
+
         .feedback-message.success {
             background-color: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
         .feedback-message.error {
             background-color: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+
         .info-message {
             text-align: center;
             padding: 20px;
             font-size: 1.1em;
             color: #555;
         }
+
         .error-message {
             color: red;
             font-weight: bold;
         }
 
-        /* Styling for table actions */
         .aksi {
-            width: 20px; /* Adjust as needed */
-            height: 20px; /* Adjust as needed */
+            width: 20px;
+            height: 20px;
             vertical-align: middle;
             margin: 0 3px;
         }
+
         td .aksi {
             cursor: pointer;
         }
 
-        /* Styling for modal (popup) */
         .popup {
             position: fixed;
             top: 0;
@@ -93,7 +95,8 @@
             gap: 15px;
         }
 
-        .btn-cancel, .btn-delete {
+        .btn-cancel,
+        .btn-delete {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
@@ -119,12 +122,24 @@
         .btn-delete:hover {
             background-color: #c82333;
         }
-        /* Tambahkan style untuk pesan loading agar ada tempatnya */
+
         .loading-message {
             text-align: center;
             padding: 20px;
             font-size: 1.1em;
             color: #555;
+        }
+        .pagination-wrapper {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .pagination-center {
+            font-size: 1em;
+            color: #333;
+        }
+        .main-content h3 {
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -217,10 +232,13 @@
     </section>
     <main>
         <div class="main-content">
+            <h3>Daftar Poli</h3>
         </div>
         <div class="card">
-            <div class="content-header"><h3>
-                    <a href="index-layanan_dokter.html" class="sub-link" style="color: #000; text-decoration: none;">Data Dokter</a>
+            <div class="content-header">
+                <h3>
+                    <a href="index-layanan_dokter.html" class="sub-link"
+                        style="color: #000; text-decoration: none; display: none;">Data Dokter</a>
                 </h3>
             </div>
             <div id="loadingMessage" class="loading-message">Memuat data dokter...</div>
@@ -237,7 +255,6 @@
                 <button class="filter-btn" style="display: none;"><img src="image/Input.svg" alt=""></button>
             </div>
 
-
             <div class="table-container">
                 <table>
                     <thead>
@@ -247,48 +264,37 @@
                             <th>Nama Dokter</th>
                             <th>Spesialis</th>
                             <th>No Handphone</th>
-                            
-                            </tr>
+                        </tr>
                     </thead>
                     <tbody id="dokterTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
             <div id="noDataMessage" class="info-message" style="display: none;">Tidak ada data dokter.</div>
 
-            <div class="pagination-wrapper" style="display: none;">
-                <div class="pagination-center">Halaman 1/1</div>
-                <a href="#" class="pagination-next"><img src="image/hal-lanjut.svg" alt=""></a>
+            <div class="pagination-wrapper">
+                <div class="pagination-center" id="paginationInfo">Total:</div>
             </div>
         </div>
     </main>
 
     <script>
-        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Jangan diubah
 
         // --- Elemen HTML yang akan dimanipulasi ---
         const dokterTableBody = document.getElementById('dokterTableBody');
         const loadingMessage = document.getElementById('loadingMessage');
         const errorMessage = document.getElementById('errorMessage');
         const noDataMessage = document.getElementById('noDataMessage');
-        const feedbackMessage = document.getElementById('feedbackMessage'); // Untuk pesan sukses/error
-
-        // Karena modal delete tidak ada di HTML yang Anda berikan,
-        // saya akan komentar atau biarkan undefined.
-        // Jika Anda tambahkan, uncomment dan sesuaikan ID-nya.
-        const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
-        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        const feedbackMessage = document.getElementById('feedbackMessage');
+        const paginationInfo = document.getElementById('paginationInfo');
 
         const searchInput = document.getElementById('searchInput');
         const searchButton = document.getElementById('searchButton');
 
-
         const userNameDisplay = document.getElementById('userNameDisplay');
         const userRoleDisplay = document.getElementById('userRoleDisplay');
         const logoutButton = document.getElementById('logoutButton');
-
-        let dokterToDeleteId = null; // Variabel untuk menyimpan ID dokter yang akan dihapus
 
         // --- Proteksi Halaman & Data User ---
         const authToken = localStorage.getItem('auth_token');
@@ -320,21 +326,12 @@
                     }
                 });
 
-                if (response.ok) {
-                    console.log('Logout Sukses');
-                } else {
-                    const errorData = await response.json();
-                    console.error('Logout Gagal:', errorData.message || response.statusText);
-                }
-
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('user_role');
                 localStorage.removeItem('user_name');
                 window.location.href = 'login.html';
 
             } catch (error) {
-                console.error('Error saat logout:', error);
-                alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('user_role');
                 localStorage.removeItem('user_name');
@@ -342,7 +339,6 @@
             }
         });
 
-        // --- Fungsi untuk Menampilkan Pesan Feedback (Sukses/Error) ---
         function showFeedbackMessage(message, type) {
             feedbackMessage.textContent = message;
             feedbackMessage.className = `feedback-message ${type}`;
@@ -352,14 +348,14 @@
             }, 5000);
         }
 
-        // --- Fungsi untuk Memuat Data Dokter (Disesuaikan dengan Poli) ---
+        // --- Fungsi untuk Memuat Data Dokter ---
         async function loadDokters(searchQuery = '') {
-            loadingMessage.style.display = 'block'; // Tampilkan pesan loading
-            errorMessage.style.display = 'none'; // Sembunyikan pesan error
-            noDataMessage.style.display = 'none'; // Sembunyikan pesan 'Tidak ada data'
-            dokterTableBody.innerHTML = ''; // Kosongkan tabel sebelumnya
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            noDataMessage.style.display = 'none';
+            dokterTableBody.innerHTML = '';
 
-            let url = `${BASE_API_URL}/dokter`; // Endpoint API untuk mendapatkan data dokter
+            let url = `${BASE_API_URL}/dokter`;
             if (searchQuery) {
                 url += `?search=${encodeURIComponent(searchQuery)}`;
             }
@@ -374,53 +370,38 @@
                 });
 
                 if (!response.ok) {
-                    const errorDetails = await response.json(); // Coba parse error response
+                    const errorDetails = await response.json();
                     throw new Error(errorDetails.message || `Gagal memuat data dokter: ${response.statusText}`);
                 }
 
                 const result = await response.json();
-                console.log('Response API Dokter:', result); // Penting untuk debugging
+                const dokters = Array.isArray(result.data) ? result.data : [];
 
-                const dokters = Array.isArray(result.data) ? result.data : []; // Pastikan ini array
-
-                loadingMessage.style.display = 'none'; // Sembunyikan pesan loading
+                loadingMessage.style.display = 'none';
 
                 if (dokters.length === 0) {
-                    noDataMessage.style.display = 'block'; // Tampilkan pesan 'Tidak ada data'
+                    noDataMessage.style.display = 'block';
+                    paginationInfo.textContent = 'Total: 0';
                     return;
                 }
 
                 dokters.forEach((dokter, index) => {
-                    const row = document.createElement('tr'); // Gunakan createElement
+                    const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${index + 1}</td>
                         <td>${dokter.id_dokter}</td>
                         <td>${dokter.nama_dokter}</td>
                         <td>${dokter.spesialis || '-'}</td>
                         <td>${dokter.no_hp_dokter || '-'}</td>
-                        <td>
-                            </td>
                     `;
-                    dokterTableBody.appendChild(row); // Tambahkan baris ke tbody
+                    dokterTableBody.appendChild(row);
                 });
 
-                // Tambahkan event listener untuk tombol hapus jika ada modalnya
-                // if (deleteConfirmationModal) { // Cek keberadaan modal
-                //     document.querySelectorAll('.delete-btn').forEach(button => {
-                //         button.addEventListener('click', (event) => {
-                //             event.preventDefault();
-                //             dokterToDeleteId = event.target.closest('.delete-btn').dataset.id;
-                //             deleteConfirmationModal.style.display = 'flex';
-                //         });
-                //     });
-                // }
-
+                paginationInfo.textContent = `Total: ${dokters.length}`;
             } catch (error) {
-                loadingMessage.style.display = 'none'; // Sembunyikan loading jika ada error
+                loadingMessage.style.display = 'none';
                 errorMessage.style.display = 'block';
                 errorMessage.textContent = 'Gagal memuat data dokter: ' + error.message;
-                console.error('Error fetching dokters data:', error);
-
                 if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
                     localStorage.removeItem('auth_token');
                     localStorage.removeItem('user_role');
@@ -431,124 +412,36 @@
             }
         }
 
-        // --- Fungsionalitas Hapus Dokter (Jika ada modal) ---
-        // Karena modal delete tidak ada di HTML Anda, bagian ini akan diabaikan.
-        // Jika Anda menambahkan modal, pastikan ID elemennya sesuai dan uncomment kode ini.
-        // if (cancelDeleteBtn && confirmDeleteBtn) {
-        //     cancelDeleteBtn.addEventListener('click', () => {
-        //         deleteConfirmationModal.style.display = 'none';
-        //         dokterToDeleteId = null;
-        //     });
-        //     confirmDeleteBtn.addEventListener('click', async () => {
-        //         // Implementasi logika DELETE API di sini
-        //         console.log('Menghapus dokter dengan ID:', dokterToDeleteId);
-        //         try {
-        //             const response = await fetch(`${BASE_API_URL}/dokter/${dokterToDeleteId}`, {
-        //                 method: 'DELETE',
-        //                 headers: {
-        //                     'Accept': 'application/json',
-        //                     'Authorization': `Bearer ${authToken}`
-        //                 }
-        //             });
-        //             if (response.ok) {
-        //                 showFeedbackMessage('Data dokter berhasil dihapus.', 'success');
-        //                 loadDokters(); // Muat ulang data setelah hapus
-        //             } else {
-        //                 const errorData = await response.json();
-        //                 showFeedbackMessage(`Gagal menghapus dokter: ${errorData.message || response.statusText}`, 'error');
-        //             }
-        //         } catch (error) {
-        //             console.error('Error deleting dokter:', error);
-        //             showFeedbackMessage('Terjadi kesalahan saat menghapus dokter.', 'error');
-        //         } finally {
-        //             deleteConfirmationModal.style.display = 'none';
-        //             dokterToDeleteId = null;
-        //         }
-        //     });
-        // }
-
-
         // --- Fungsionalitas Pencarian ---
-        searchButton.addEventListener('click', async () => {
+        searchButton.addEventListener('click', () => {
             const query = searchInput.value.trim();
-            if (!query) {
-            loadDokters('');
-            return;
-            }
-
-            loadingMessage.style.display = 'block';
-            errorMessage.style.display = 'none';
-            noDataMessage.style.display = 'none';
-            dokterTableBody.innerHTML = '';
-
-            try {
-            const url = new URL(`${BASE_API_URL}/dokter`);
-            url.searchParams.append('search', query);
-
-            const response = await fetch(url.toString(), {
-                method: 'GET',
-                headers: {
-                'Accept': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-                }
-            });
-
-            if (!response.ok) {
-                const errorDetails = await response.json();
-                throw new Error(errorDetails.message || `Gagal memuat data dokter: ${response.statusText}`);
-            }
-
-            const result = await response.json();
-            // Filter hanya berdasarkan nama_dokter (case-insensitive)
-            const filtered = (result.data || []).filter(item =>
-                item.nama_dokter && item.nama_dokter.toLowerCase().includes(query.toLowerCase())
-            );
-
-            loadingMessage.style.display = 'none';
-
-            if (filtered.length === 0) {
-                noDataMessage.style.display = 'block';
-                noDataMessage.textContent = `Data Dokter ${query} tidak ditemukan`;
-                return;
-            }
-
-            filtered.forEach((dokter, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${dokter.id_dokter}</td>
-                <td>${dokter.nama_dokter}</td>
-                <td>${dokter.spesialis || '-'}</td>
-                <td>${dokter.no_hp_dokter || '-'}</td>
-                `;
-                dokterTableBody.appendChild(row);
-            });
-
-            } catch (error) {
-            loadingMessage.style.display = 'none';
-            errorMessage.style.display = 'block';
-            errorMessage.textContent = 'Gagal memuat data dokter: ' + error.message;
-            if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
-                localStorage.removeItem('auth_token');
-                localStorage.removeItem('user_role');
-                localStorage.removeItem('user_name');
-                alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
-                window.location.href = 'login.html';
-            }
-            }
+            loadDokters(query);
         });
 
         searchInput.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-            searchButton.click();
+                const query = searchInput.value.trim();
+                loadDokters(query);
             }
         });
 
+        // --- Filter baris tabel secara real-time saat mengetik ---
+        searchInput.addEventListener('keyup', function () {
+            const filter = searchInput.value.toLowerCase();
+            const rows = dokterTableBody.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                let namaDokter = rows[i].cells[2]?.textContent.toLowerCase();
+                if (namaDokter && namaDokter.includes(filter)) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        });
 
-        // Panggil fungsi untuk memuat data saat halaman dimuat
         document.addEventListener('DOMContentLoaded', loadDokters);
 
-        // --- Kode untuk sidebar dan popup profil yang sudah ada ---
+        // --- Sidebar & Profile Popup ---
         let arrow = document.querySelectorAll(".arrow");
         for (var i = 0; i < arrow.length; i++) {
             arrow[i].addEventListener("click", (e) => {
@@ -571,13 +464,11 @@
         document.addEventListener("click", function (e) {
             const trigger = document.querySelector(".profile-trigger");
             const popup = document.getElementById("profile-popup");
-
             if (!trigger.contains(e.target) && !popup.contains(e.target)) {
                 popup.classList.add("hidden");
             }
         });
 
-        // Inisialisasi Date Range Picker (tetap ada jika suatu saat dibutuhkan)
         $(function () {
             $('#dateRange').daterangepicker({
                 opens: 'right',
@@ -585,8 +476,7 @@
                     format: 'DD MMMYYYY'
                 }
             }, function (start, end) {
-                console.log("Dari:", start.format('YYYY-MM-DD'), "Sampai:", end.format('YYYY-MM-DD'));
-                // Kamu bisa trigger filter di sini jika diaktifkan
+                // Untuk filter tanggal jika dibutuhkan
             });
         });
     </script>

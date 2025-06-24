@@ -4,28 +4,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Pasien - Rumah Sakit Islam Banjarmasin</title> <link rel="stylesheet" href="style/style-pasien.css">
+    <title>Data Pasien - Rumah Sakit Islam Banjarmasin</title>
+    <link rel="stylesheet" href="style/style-pasien.css">
     <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
     <style>
-        /* Beberapa styling dasar untuk pesan error, bisa dipindahkan ke style-pasien.css */
-        .loading-message, .error-message {
+        .loading-message,
+        .error-message {
             text-align: center;
             padding: 20px;
             font-size: 1.1em;
             color: #555;
         }
+
         .error-message {
             color: red;
             font-weight: bold;
         }
-        /* Style untuk status Aktif/Nonaktif jika diperlukan */
+
         .status.aktif {
             color: green;
             font-weight: bold;
         }
+
         .status.nonaktif {
             color: orange;
             font-weight: bold;
+        }
+
+        /* Filter Modal */
+        .filter-modal {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 16px;
+            z-index: 10;
+            min-width: 160px;
+        }
+        .filter-modal.show {
+            display: block;
+        }
+        .filter-modal label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .filter-modal .button-group {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+        }
+        .filter-wrapper {
+            position: relative;
+            display: inline-block;
         }
     </style>
 </head>
@@ -102,7 +136,6 @@
             <div class="profile-trigger" onclick="toggleProfilePopup()">
                 <img src="image/admin.svg" alt="User" class="profile-icon">
             </div>
-
             <div id="profile-popup" class="profile-popup hidden">
                 <div class="popup-content">
                     <img src="image/admin.svg" alt="User" class="popup-icon">
@@ -124,10 +157,27 @@
         <div class="card">
             <div class="top-bar">
                 <div class="search-group">
-                    <input type="text" id="searchInput" placeholder="Cari Berdasarkan Nama Pasien" />
-                    <button class="search-btn" id="searchButton"><i class="bx bx-search"></i></button>
+                    <input type="text" id="searchInput" placeholder="Cari Berdasarkan Rekam Medis / Nama / NIK" />
+                    <div class="filter-wrapper">
+                        <button class="filter-btn" id="filterButton">
+                            <img src="image/Input.svg" alt="">
+                        </button>
+                        <div id="filterModal" class="filter-modal">
+                            <label>
+                                <input type="checkbox" name="gender" value="pria">
+                                Pria
+                            </label>
+                            <label>
+                                <input type="checkbox" name="gender" value="perempuan">
+                                Perempuan
+                            </label>
+                            <div class="button-group">
+                                <button id="applyFilter" type="button">Terapkan</button>
+                                <button id="clearFilter" type="button">Reset</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <button class="filter-btn"><img src="image/Input.svg" alt=""></button>
             </div>
             <div id="loadingMessage" class="loading-message">Memuat data pasien...</div>
             <div id="errorMessage" class="error-message" style="display: none;"></div>
@@ -138,14 +188,9 @@
                         <th>Rekam Medis</th>
                         <th>NIK</th>
                         <th>Nama Pasien</th>
-                        <th>Tanggal Lahir</th>
-                        <th>Agama</th>
-                        <th>Kabupaten</th>
-                        <th>Pekerjaan</th>
                         <th>Jenis Kelamin</th>
-                        <th>Alamat</th>
+                        <th>Tanggal Lahir</th>
                         <th>No Hp</th>
-                        <th>Email</th>
                         <th>Golongan Darah</th>
                         <th>Aksi</th>
                     </tr>
@@ -154,13 +199,13 @@
                 </tbody>
             </table>
             <div class="pagination-wrapper">
-                <div class="pagination-center" id="paginationInfo">Halaman -/-</div>
-                </div>
+                <div class="pagination-center" id="paginationInfo">Total:</div>
+            </div>
         </div>
     </main>
 
     <script>
-        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api'; // Pastikan sesuai URL Laravel Anda
+        const BASE_API_URL = 'https://ti054a01.agussbn.my.id/api';
 
         // --- Elemen HTML yang akan dimanipulasi ---
         const pasienTableBody = document.getElementById('pasienTableBody');
@@ -187,12 +232,8 @@
 
         // --- Fungsionalitas Logout ---
         logoutButton.addEventListener('click', async (event) => {
-            event.preventDefault(); // Mencegah navigasi default
-
-            if (!confirm('Apakah Anda yakin ingin keluar?')) {
-                return;
-            }
-
+            event.preventDefault();
+            if (!confirm('Apakah Anda yakin ingin keluar?')) return;
             try {
                 const response = await fetch(`${BASE_API_URL}/logout`, {
                     method: 'POST',
@@ -201,25 +242,11 @@
                         'Authorization': `Bearer ${authToken}`
                     }
                 });
-
-                if (response.ok) {
-                    console.log('Logout Sukses');
-                } else {
-                    const errorData = await response.json();
-                    console.error('Logout Gagal:', errorData.message || response.statusText);
-                }
-
-                // Hapus token dan role dari localStorage, terlepas dari respons backend
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('user_role');
                 localStorage.removeItem('user_name');
-
-                // Arahkan kembali ke halaman login
                 window.location.href = 'login.html';
-
             } catch (error) {
-                console.error('Error saat logout:', error);
-                alert('Terjadi kesalahan saat mencoba keluar. Silakan coba lagi.');
                 localStorage.removeItem('auth_token');
                 localStorage.removeItem('user_role');
                 localStorage.removeItem('user_name');
@@ -228,164 +255,28 @@
         });
 
         // --- Fungsi untuk Mengambil dan Menampilkan Data Pasien ---
+        let pasienDataCache = [];
         async function fetchPasienData() {
-            loadingMessage.style.display = 'block'; // Tampilkan pesan loading
-            errorMessage.style.display = 'none'; // Sembunyikan pesan error
-            pasienTableBody.innerHTML = ''; // Kosongkan tabel sebelum memuat data baru
-
-            try {
-                const response = await fetch(`${BASE_API_URL}/pasien`, { // Endpoint API Pasien
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${authToken}` // Kirim token untuk otorisasi
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorDetails = await response.json();
-                    throw new Error(errorDetails.message || `Gagal mengambil data pasien: ${response.statusText}`);
-                }
-
-                const result = await response.json();
-                const pasiens = result.data; // Data pasien ada di dalam properti 'data' karena PasienResource::collection
-
-                loadingMessage.style.display = 'none'; // Sembunyikan pesan loading
-
-                if (pasiens.length === 0) {
-                    pasienTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Tidak ada data pasien.</td></tr>';
-                    paginationInfo.textContent = 'Halaman 0/0';
-                    return;
-                }
-
-                pasiens.forEach((pasien, index) => {
-                    const row = document.createElement('tr');
-                    // Perhatikan bahwa nama properti (pasien.rm, pasien.nama_pasien, dll.)
-                    // harus sesuai dengan nama kolom di resource PasienResource Anda.
-                    // Jika Anda memiliki mutator di model atau resource, sesuaikan.
-                    // Contoh: tgl_lahir di database mungkin perlu diformat.
-                    const formattedTglLahir = new Date(pasien.tgl_lahir).toLocaleDateString('id-ID', {
-                        day: '2-digit', month: '2-digit', year: 'numeric'
-                    });
-                    const statusPasien = pasien.status || 'Aktif'; // Asumsi ada kolom status, default 'Aktif'
-                    const statusClass = statusPasien === 'Aktif' ? 'aktif' : 'nonaktif';
-
-                    row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${pasien.rm}</td>
-                        <td>${pasien.nik}</td>
-                        <td>${pasien.nama_pasien}</td>
-                        <td>${formattedTglLahir}</td>
-                        <td>${pasien.agama}</td>
-                        <td>${pasien.kabupaten || '-'}</td>
-                        <td>${pasien.pekerjaan || '-'}</td>
-                        <td>${pasien.jns_kelamin}</td>
-                        <td>${pasien.alamat}</td>
-                        <td>${pasien.no_hp_pasien}</td>
-                        <td>${pasien.email_pasien || '-'}</td>
-                        <td>${pasien.gol_darah || '-'}</td>
-                        <td>
-                            <a href="index-pasien_detail.html?rm=${pasien.rm}"><img src="image/eye.svg" alt="Detail" class="aksi"></a>                            
-                            </td>
-                    `;
-                    pasienTableBody.appendChild(row);
-                });
-
-                paginationInfo.textContent = `Halaman 1/1`; // Karena belum ada pagination API
-
-            } catch (error) {
-                loadingMessage.style.display = 'none';
-                errorMessage.style.display = 'block';                
-                errorMessage.textContent = 'Gagal memuat data pasien: ' + error.message;
-                console.error('Error fetching pasien data:', error);
-                // Jika error adalah karena autentikasi, arahkan ke login
-                if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
-                    localStorage.removeItem('auth_token');
-                    localStorage.removeItem('user_role');
-                    localStorage.removeItem('user_name');
-                    alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
-                    window.location.href = 'login.html';
-                }
-            }
-        }
-
-        // --- Panggil fungsi untuk mengambil data saat halaman dimuat ---
-        document.addEventListener('DOMContentLoaded', fetchPasienData);
-        // --- Fungsionalitas Pencarian Pasien ---
-        searchButton.addEventListener('click', async () => {
-            const query = searchInput.value.trim();
-            if (!query) {
-                fetchPasienData();
-                return;
-            }
-
             loadingMessage.style.display = 'block';
             errorMessage.style.display = 'none';
             pasienTableBody.innerHTML = '';
-
             try {
-                const url = new URL(`${BASE_API_URL}/pasien`);
-                url.searchParams.append('search', query);
-
-                const response = await fetch(url.toString(), {
+                const response = await fetch(`${BASE_API_URL}/pasien`, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${authToken}`
                     }
                 });
-
                 if (!response.ok) {
                     const errorDetails = await response.json();
-                    throw new Error(errorDetails.message || `Gagal memuat data pasien: ${response.statusText}`);
+                    throw new Error(errorDetails.message || `Gagal mengambil data pasien: ${response.statusText}`);
                 }
-
                 const result = await response.json();
-                // Filter berdasarkan nama_pasien, rm, atau nik (case-insensitive)
-                const filtered = (result.data || []).filter(item =>
-                    (item.nama_pasien && String(item.nama_pasien).toLowerCase().includes(query.toLowerCase())) ||
-                    (typeof item.rm === 'string' && item.rm.toLowerCase().includes(query.toLowerCase())) ||
-                    (typeof item.rm === 'number' && item.rm.toString().toLowerCase().includes(query.toLowerCase())) ||
-                    (item.nik && String(item.nik).toLowerCase().includes(query.toLowerCase()))
-                );
-
+                const pasiens = result.data || [];
+                pasienDataCache = pasiens;
                 loadingMessage.style.display = 'none';
-
-                if (filtered.length === 0) {
-                    pasienTableBody.innerHTML = `<tr><td colspan="14" style="text-align: center;">Data Pasien "${query}" tidak ditemukan.</td></tr>`;
-                    paginationInfo.textContent = 'Halaman 1/1';
-                    return;
-                }
-
-                filtered.forEach((pasien, index) => {
-                    const formattedTglLahir = new Date(pasien.tgl_lahir).toLocaleDateString('id-ID', {
-                        day: '2-digit', month: '2-digit', year: 'numeric'
-                    });
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${index + 1}</td>
-                        <td>${pasien.rm}</td>
-                        <td>${pasien.nik}</td>
-                        <td>${pasien.nama_pasien}</td>
-                        <td>${formattedTglLahir}</td>
-                        <td>${pasien.agama}</td>
-                        <td>${pasien.kabupaten || '-'}</td>
-                        <td>${pasien.pekerjaan || '-'}</td>
-                        <td>${pasien.jns_kelamin}</td>
-                        <td>${pasien.alamat}</td>
-                        <td>${pasien.no_hp_pasien}</td>
-                        <td>${pasien.email_pasien || '-'}</td>
-                        <td>${pasien.gol_darah || '-'}</td>
-                        <td>
-                            <a href="index-pasien_detail.html?rm=${pasien.rm}"><img src="image/eye.svg" alt="Detail" class="aksi"></a>
-                        </td>
-                    `;
-                    pasienTableBody.appendChild(row);
-                });
-
-                paginationInfo.textContent = `Halaman 1/1`;
-
+                renderPasienTable(pasiens);
             } catch (error) {
                 loadingMessage.style.display = 'none';
                 errorMessage.style.display = 'block';
@@ -398,45 +289,133 @@
                     window.location.href = 'login.html';
                 }
             }
-        });
+        }
 
-        searchInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                searchButton.click();
+        function renderPasienTable(pasiens) {
+            pasienTableBody.innerHTML = '';
+            if (!pasiens.length) {
+                pasienTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Tidak ada data pasien.</td></tr>';
+                paginationInfo.textContent = 'Total: 0';
+                return;
             }
-        });
+            pasiens.forEach((pasien, index) => {
+                const formattedTglLahir = pasien.tgl_lahir ? new Date(pasien.tgl_lahir).toLocaleDateString('id-ID', {
+                    day: '2-digit', month: '2-digit', year: 'numeric'
+                }) : '-';
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${pasien.rm || '-'}</td>
+                    <td>${pasien.nik || '-'}</td>
+                    <td>${pasien.nama_pasien || '-'}</td>
+                    <td>${pasien.jns_kelamin || '-'}</td>
+                    <td>${formattedTglLahir}</td>
+                    <td>${pasien.no_hp_pasien || '-'}</td>
+                    <td>${pasien.gol_darah || '-'}</td>
+                    <td>
+                        <a href="index-pasien_detail.html?rm=${pasien.rm}"><img src="image/eye.svg" alt="Detail" class="aksi"></a>
+                    </td>
+                `;
+                pasienTableBody.appendChild(row);
+            });
+            paginationInfo.textContent = `Total: ${pasiens.length}`;
+        }
+
+        // --- Panggil fungsi untuk mengambil data saat halaman dimuat ---
+        document.addEventListener('DOMContentLoaded', fetchPasienData);
 
         // --- Kode untuk sidebar dan popup profil yang sudah ada ---
         let arrow = document.querySelectorAll(".arrow");
         for (var i = 0; i < arrow.length; i++) {
             arrow[i].addEventListener("click", (e) => {
                 let arrowParent = e.target.parentElement.parentElement;
-                console.log(arrowParent);
                 arrowParent.classList.toggle("showMenu");
             });
         }
-
         let sidebar = document.querySelector(".sidebar");
         let sidebarBtn = document.querySelector(".bx-menu");
-        console.log(sidebarBtn);
         sidebarBtn.addEventListener("click", () => {
             sidebar.classList.toggle("close");
         });
-
         function toggleProfilePopup() {
             const popup = document.getElementById("profile-popup");
             popup.classList.toggle("hidden");
         }
-
         document.addEventListener("click", function (e) {
             const trigger = document.querySelector(".profile-trigger");
             const popup = document.getElementById("profile-popup");
-
             if (!trigger.contains(e.target) && !popup.contains(e.target)) {
                 popup.classList.add("hidden");
             }
         });
 
+        // --- Kode untuk search dan filter ---
+        const searchInput = document.getElementById('searchInput');
+        const filterBtn = document.getElementById('filterButton');
+        const filterModal = document.getElementById('filterModal');
+        const applyBtn = document.getElementById('applyFilter');
+        const clearBtn = document.getElementById('clearFilter');
+
+        // Search filter (client-side)
+        searchInput.addEventListener('keyup', function () {
+            const filter = searchInput.value.toLowerCase();
+            const filtered = pasienDataCache.filter(item =>
+                (item.rm && String(item.rm).toLowerCase().includes(filter)) ||
+                (item.nik && String(item.nik).toLowerCase().includes(filter)) ||
+                (item.nama_pasien && String(item.nama_pasien).toLowerCase().includes(filter))
+            );
+            renderPasienTable(filtered);
+        });
+
+        // Toggle Modal
+        filterBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            filterModal.classList.toggle('show');
+        });
+        document.addEventListener('click', function (e) {
+            if (!filterModal.contains(e.target) && !filterBtn.contains(e.target)) {
+                filterModal.classList.remove('show');
+            }
+        });
+
+        // Apply Filter
+        applyBtn.addEventListener('click', () => {
+            const selectedGenders = Array.from(document.querySelectorAll('input[name="gender"]:checked')).map(input => input.value.toLowerCase());
+            let filtered = pasienDataCache;
+            if (selectedGenders.length > 0) {
+                filtered = filtered.filter(item =>
+                    selectedGenders.includes((item.jns_kelamin || '').toLowerCase())
+                );
+            }
+            // Apply search filter as well
+            const filter = searchInput.value.toLowerCase();
+            if (filter) {
+                filtered = filtered.filter(item =>
+                    (item.rm && String(item.rm).toLowerCase().includes(filter)) ||
+                    (item.nik && String(item.nik).toLowerCase().includes(filter)) ||
+                    (item.nama_pasien && String(item.nama_pasien).toLowerCase().includes(filter))
+                );
+            }
+            renderPasienTable(filtered);
+            filterModal.classList.remove('show');
+        });
+
+        // Clear Filter
+        clearBtn.addEventListener('click', () => {
+            document.querySelectorAll('input[name="gender"]').forEach(input => input.checked = false);
+            // Apply search filter only
+            const filter = searchInput.value.toLowerCase();
+            let filtered = pasienDataCache;
+            if (filter) {
+                filtered = filtered.filter(item =>
+                    (item.rm && String(item.rm).toLowerCase().includes(filter)) ||
+                    (item.nik && String(item.nik).toLowerCase().includes(filter)) ||
+                    (item.nama_pasien && String(item.nama_pasien).toLowerCase().includes(filter))
+                );
+            }
+            renderPasienTable(filtered);
+            filterModal.classList.remove('show');
+        });
     </script>
 </body>
 

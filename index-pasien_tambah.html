@@ -137,11 +137,7 @@
                         <label for="rm">Rekam Medis (RM)</label>
                         <input type="text" id="rm" name="rm" required pattern="[0-9]+" title="Rekam Medis harus angka">
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="nama_pasien">Nama Pasien</label>
-                        <input type="text" id="nama_pasien" name="nama_pasien" required>
-                    </div>
+
                     <div class="form-group">
                         <label for="nik">NIK</label>
                         <input type="text" id="nik" name="nik" required pattern="[0-9]{16}" title="NIK harus 16 digit angka" maxlength="16">
@@ -167,31 +163,10 @@
                     </script>
 
                     <div class="form-group">
-                        <label>Jenis Kelamin</label>
-                        <div class="radio-group">
-                            <label><input type="radio" name="jns_kelamin" value="pria" required> Laki-laki</label>
-                            <label><input type="radio" name="jns_kelamin" value="perempuan"> Perempuan</label>
-                        </div>
+                        <label for="nama_pasien">Nama Pasien</label>
+                        <input type="text" id="nama_pasien" name="nama_pasien" required>
                     </div>
-                    <div class="form-group">
-                        <label for="kabupaten">Kabupaten</label>
-                        <select id="kabupaten" name="kabupaten" required>
-                            <option value="">-- Pilih Kabupaten --</option>
-                            <option value="Banjar">Banjar</option>
-                            <option value="Barito Kuala">Barito Kuala</option>
-                            <option value="Tapin">Tapin</option>
-                            <option value="Hulu Sungai Selatan">Hulu Sungai Selatan</option>
-                            <option value="Hulu Sungai Tengah">Hulu Sungai Tengah</option>
-                            <option value="Hulu Sungai Utara">Hulu Sungai Utara</option>
-                            <option value="Tabalong">Tabalong</option>
-                            <option value="Tanah Laut">Tanah Laut</option>
-                            <option value="Tanah Bumbu">Tanah Bumbu</option>
-                            <option value="Balangan">Balangan</option>
-                            <option value="Kotabaru">Kotabaru</option>
-                            <option value="Banjarmasin (Kota)">Banjarmasin (Kota)</option>
-                            <option value="Banjarbaru (Kota)">Banjarbaru (Kota)</option>
-                        </select>
-                    </div>                    
+
                     <div class="form-group">
                         <label for="agama">Agama</label>
                         <select id="agama" name="agama" required>
@@ -203,20 +178,6 @@
                             <option value="Buddha">Buddha</option>
                             <option value="Konghucu">Konghucu</option>
                             <option value="Lainnya">Lainnya</option>
-                        </select>
-                    </div>                    
-                    <div class="form-group">
-                        <label for="pekerjaan">Pekerjaan</label>
-                        <input type="text" id="pekerjaan" name="pekerjaan" required />
-                    </div>
-                    <div class="form-group">
-                        <label for="gol_darah">Golongan Darah</label>
-                        <select id="gol_darah" name="gol_darah" required>
-                            <option value="">-- Pilih --</option>
-                            <option value="A">A</option>
-                            <option value="B">B</option>
-                            <option value="AB">AB</option>
-                            <option value="O">O</option>
                         </select>
                     </div>
 
@@ -244,6 +205,49 @@
                     </script>
 
                     <div class="form-group">
+                        <label for="gol_darah">Golongan Darah</label>
+                        <select id="gol_darah" name="gol_darah" required>
+                            <option value="">-- Pilih --</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="AB">AB</option>
+                            <option value="O">O</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pekerjaan">Pekerjaan</label>
+                        <input type="text" id="pekerjaan" name="pekerjaan" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jenis Kelamin</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="jns_kelamin" value="pria" required> Laki-laki</label>
+                            <label><input type="radio" name="jns_kelamin" value="perempuan"> Perempuan</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email_pasien">Email</label>
+                        <input type="email" id="email_pasien" name="email_pasien" required>
+                        <div id="emailError" style="color:#d32f2f;font-size:13px;display:none;margin-top:4px;">Masukkan email dengan benar</div>
+                    </div>
+                    <script>
+                        const emailInput = document.getElementById('email_pasien');
+                        const emailError = document.getElementById('emailError');
+                        emailInput.addEventListener('input', function () {
+                            // Simple email regex validation
+                            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                            if (this.value.length > 0 && !emailPattern.test(this.value)) {
+                                emailError.style.display = 'block';
+                            } else {
+                                emailError.style.display = 'none';
+                            }
+                        });
+                    </script>
+
+                    <div class="form-group">
                         <label for="no_hp_pasien">Nomor Hp</label>
                         <input type="text" id="no_hp_pasien" name="no_hp_pasien" required pattern="[0-9]{9,13}" title="Nomor HP minimal 9 digit dan maksimal 13 digit angka" maxlength="13">
                         <div id="noHpError" style="color:#d32f2f;font-size:13px;display:none;margin-top:4px;">Nomor HP harus 9-13 digit angka</div>
@@ -265,24 +269,26 @@
                             }
                         });
                     </script>
+
                     <div class="form-group">
-                        <label for="email_pasien">Email</label>
-                        <input type="email" id="email_pasien" name="email_pasien" required>
-                        <div id="emailError" style="color:#d32f2f;font-size:13px;display:none;margin-top:4px;">Masukkan email dengan benar</div>
+                        <label for="kabupaten">Kabupaten</label>
+                        <select id="kabupaten" name="kabupaten" required>
+                            <option value="">-- Pilih Kabupaten --</option>
+                            <option value="Banjar">Banjar</option>
+                            <option value="Barito Kuala">Barito Kuala</option>
+                            <option value="Tapin">Tapin</option>
+                            <option value="Hulu Sungai Selatan">Hulu Sungai Selatan</option>
+                            <option value="Hulu Sungai Tengah">Hulu Sungai Tengah</option>
+                            <option value="Hulu Sungai Utara">Hulu Sungai Utara</option>
+                            <option value="Tabalong">Tabalong</option>
+                            <option value="Tanah Laut">Tanah Laut</option>
+                            <option value="Tanah Bumbu">Tanah Bumbu</option>
+                            <option value="Balangan">Balangan</option>
+                            <option value="Kotabaru">Kotabaru</option>
+                            <option value="Banjarmasin (Kota)">Banjarmasin (Kota)</option>
+                            <option value="Banjarbaru (Kota)">Banjarbaru (Kota)</option>
+                        </select>
                     </div>
-                    <script>
-                        const emailInput = document.getElementById('email_pasien');
-                        const emailError = document.getElementById('emailError');
-                        emailInput.addEventListener('input', function () {
-                            // Simple email regex validation
-                            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                            if (this.value.length > 0 && !emailPattern.test(this.value)) {
-                                emailError.style.display = 'block';
-                            } else {
-                                emailError.style.display = 'none';
-                            }
-                        });
-                    </script>
 
                     <div class="form-group full-width">
                         <label for="alamat">Alamat</label>
@@ -293,8 +299,8 @@
                         <button type="submit" class="btn btn-primary" id="submitButton">Tambah</button>
                     </div>
                 </div>
-            </form>
-            <div id="responseMessage" class="message-container" style="display: none;"></div>
+            </form></div>
+            <div id="responseMessage" class="message-container" style="display: none;">
         </div>
 
         <div id="popupSuccess" class="popup">
