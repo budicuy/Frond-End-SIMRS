@@ -454,6 +454,8 @@
 
         // --- PERBAIKAN: Fungsi tunggal untuk mengambil nomor antrian ---
         // --- PERBAIKAN TOTAL: Fungsi untuk mengambil nomor antrian berikutnya ---
+        // --- PERBAIKAN TOTAL: Fungsi untuk mengambil nomor antrian berikutnya ---
+        // --- PERBAIKAN DEFINITIF: Fungsi untuk mengambil nomor antrian berikutnya ---
         async function fetchNextNoAntrian() {
             const id_poli = poliSelect.value;
             const tgl_kunjungan = tanggalInput.value;
@@ -462,39 +464,47 @@
             noAntrianInput.disabled = true;
             noAntrianInput.placeholder = "Memuat...";
 
+            // Jika salah satu input (poli atau tanggal) kosong, jangan lakukan apa-apa.
             if (!id_poli || !tgl_kunjungan) {
                 noAntrianInput.placeholder = "Pilih poli dan tanggal";
                 return;
             }
 
             try {
-                // Menggunakan endpoint max-antrian sesuai dokumentasi
+                // INI BAGIAN KUNCI: Gunakan endpoint 'pendaftarans' (plural) sesuai standar
+                // dan kirim parameter seperti yang diharapkan oleh controller Anda.
                 const url = `${BASE_API_URL}/pendaftarans/max-antrian?id_poli=${id_poli}&tgl_kunjungan=${tgl_kunjungan}`;
+                
                 const response = await fetch(url, {
-                    method: 'GET',
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${authToken}`
                     }
                 });
 
+                const result = await response.json();
+
+                // Jika response dari server tidak OK (misal: error 422 karena validasi gagal)
                 if (!response.ok) {
-                    throw new Error('Gagal memuat no antrian.');
+                    // Ambil pesan error dari controller jika ada
+                    let errorMsg = result.message || 'Gagal mengambil data antrian.';
+                    if(result.errors) {
+                       errorMsg = Object.values(result.errors).map(e => e.join(' ')).join(' ');
+                    }
+                    throw new Error(errorMsg);
                 }
 
-                const result = await response.json();
-                // Jika data null, berarti belum ada antrian hari itu
-                let nextNo = 1;
-                if (result.data && result.data.max_antrian) {
-                    nextNo = Number(result.data.max_antrian) + 1;
-                }
+                // Controller mengembalikan { "max_no_antrian": ... }
+                const maxAntrian = result.max_no_antrian || 0;
+                const nextNo = Number(maxAntrian) + 1;
                 
                 noAntrianInput.value = nextNo;
                 noAntrianInput.disabled = false;
 
             } catch (error) {
+                // Tampilkan pesan error yang lebih informatif
                 showFeedbackMessage(error.message, 'error');
-                noAntrianInput.value = 1; 
+                noAntrianInput.value = 1; // Fallback ke 1 jika gagal
                 noAntrianInput.disabled = false;
                 noAntrianInput.placeholder = "Gagal, coba isi manual";
             }
