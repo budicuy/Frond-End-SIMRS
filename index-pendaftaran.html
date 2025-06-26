@@ -520,7 +520,7 @@
                 document.querySelectorAll('.status-btn').forEach(button => {
                     button.addEventListener('click', async (event) => {
                         const id = event.target.dataset.id;
-                        if (!confirm('Apakah Anda yakin ingin memanggil pasien ini dan mengubah status menjadi selesai?')) {
+                        if (!confirm('Apakah Anda yakin ingin memanggil pasien ini dan mengubah status menjadi menunggu diperiksa?')) {
                             return;
                         }
                         try {
