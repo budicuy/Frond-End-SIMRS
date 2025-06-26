@@ -420,10 +420,19 @@
             loadPolis(query);
         });
 
-        searchInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                const query = searchInput.value.trim();
-                loadPolis(query);
+        // Filter real-time berdasarkan id_poli atau nama_poli
+        searchInput.addEventListener('keyup', function () {
+            const filter = searchInput.value.toLowerCase();
+            const rows = poliTableBody.getElementsByTagName('tr');
+            for (let i = 0; i < rows.length; i++) {
+                const idPoli = rows[i].cells[1]?.textContent.toLowerCase(); // Kolom ID Poli
+                const namaPoli = rows[i].cells[2]?.textContent.toLowerCase(); // Kolom Nama Poli
+
+                if ((idPoli && idPoli.includes(filter)) || (namaPoli && namaPoli.includes(filter))) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
             }
         });
 
