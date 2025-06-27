@@ -519,10 +519,48 @@
 
                 document.querySelectorAll('.status-btn').forEach(button => {
                     button.addEventListener('click', async (event) => {
+                        const row = event.target.closest('tr');
                         const id = event.target.dataset.id;
-                        if (!confirm('Apakah Anda yakin ingin memanggil pasien ini dan mengubah status menjadi menunggu diperiksa?')) {
+                        // Ambil status saat ini dari kolom status
+                        const statusCell = row.querySelector('td:nth-child(8)');
+                        let currentStatusText = statusCell.textContent.trim().toLowerCase();
+
+                        // Mapping status text ke status code
+                        let statusMap = {
+                            'menunggu': 0,
+                            'diperiksa': 1,
+                            'selesai diperiksa': 2,
+                            'selesai pembayaran': 3,
+                            'selesai': 4
+                        };
+
+                        let nextStatusMap = {
+                            0: 1,
+                            1: 2,
+                            2: 3,
+                            3: 4
+                        };
+
+                        let currentStatus = statusMap[currentStatusText];
+                        let nextStatus = nextStatusMap[currentStatus];
+
+                        if (nextStatus === undefined) {
+                            showFeedbackMessage('Status sudah selesai, tidak dapat diubah lagi.', 'error');
                             return;
                         }
+
+                        let statusTextArr = [
+                            'Menunggu',
+                            'Diperiksa',
+                            'Selesai diperiksa',
+                            'Selesai pembayaran',
+                            'Selesai'
+                        ];
+
+                        if (!confirm(`Apakah Anda yakin ingin mengubah status menjadi "${statusTextArr[nextStatus]}"?`)) {
+                            return;
+                        }
+
                         try {
                             const response = await fetch(`${BASE_API_URL}/pendaftaran/${id}`, {
                                 method: 'PUT',
@@ -531,7 +569,7 @@
                                     'Content-Type': 'application/json',
                                     'Authorization': `Bearer ${authToken}`
                                 },
-                                body: JSON.stringify({ status: 1 })
+                                body: JSON.stringify({ status: nextStatus })
                             });
 
                             if (!response.ok) {
@@ -539,7 +577,7 @@
                                 throw new Error(errorDetails.message || `Gagal mengubah status: ${response.statusText}`);
                             }
 
-                            showFeedbackMessage('Status berhasil diubah menjadi selesai.', 'success');
+                            showFeedbackMessage(`Status berhasil diubah menjadi "${statusTextArr[nextStatus]}".`, 'success');
                             loadPendaftarans(searchInput.value.trim());
 
                         } catch (error) {
