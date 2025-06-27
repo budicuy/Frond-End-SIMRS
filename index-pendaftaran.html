@@ -589,7 +589,7 @@
                 const pendaftaran = result.data;
 
                 // Periksa status pendaftaran: hanya tampilkan jika BUKAN status 3 atau "Selesai"
-                if (String(pendaftaran.status_raw) === '3' || (typeof pendaftaran.status === 'string' && pendaftaran.status.toLowerCase() === 'selesai')) {
+                if (String(pendaftaran.status_raw) === '4' || (typeof pendaftaran.status === 'string' && pendaftaran.status.toLowerCase() === 'Selesai')) {
                     showFeedbackMessage('Detail pendaftaran ini berstatus "Selesai" dan tidak ditampilkan di sini.', 'error');
                     return;
                 }

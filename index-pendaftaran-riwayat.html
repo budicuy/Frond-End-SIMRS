@@ -300,7 +300,7 @@
                 const result = await response.json();
                 // Filter data agar hanya status == 3 atau "Selesai" yang ditampilkan
                 const pendaftarans = (result.data || []).filter(item =>
-                    String(item.status_raw) === '3' || (typeof item.status === 'string' && item.status.toLowerCase() === 'selesai')
+                    String(item.status_raw) === '4' || (typeof item.status === 'string' && item.status.toLowerCase() === 'Selesai')
                 );
 
                 loadingMessage.style.display = 'none';
