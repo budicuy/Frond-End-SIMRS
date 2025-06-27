@@ -105,8 +105,182 @@
             <div id="feedbackMessage" class="feedback-message" style="display: none;"></div>
             <div class="top-bar">
                 <div class="search-group">
-                    <input type="text" placeholder="Cari berdasarkan No. Regis / Nama Pasien" id="searchInput">
+                    <input type="text" placeholder="Cari berdasarkan No. Regis / Nama Pasien" id="searchInput">                    
                     <button class="search-btn" id="searchButton"><i class="bx bx-search"></i></button>
+                    <div id="filterModal" class="filter-modal">
+                            <label>
+                                <select id="filterPoli" name="detail_poli">
+                                    <option value="">-- Semua Poli --</option>
+                                </select>
+                            </label>
+                            <script>
+                                // Ambil daftar poli dari API dan isi dropdown filterPoli
+                                document.addEventListener('DOMContentLoaded', async function () {
+                                    const filterPoli = document.getElementById('filterPoli');
+                                    if (!filterPoli) return;
+                                    try {
+                                        const response = await fetch(`${BASE_API_URL}/poli`, {
+                                            headers: {
+                                                'Accept': 'application/json',
+                                                'Authorization': `Bearer ${authToken}`
+                                            }
+                                        });
+                                        if (response.ok) {
+                                            const data = await response.json();
+                                            (data.data || []).forEach(poli => {
+                                                const option = document.createElement('option');
+                                                option.value = poli.nama_poli;
+                                                option.textContent = poli.nama_poli;
+                                                filterPoli.appendChild(option);
+                                            });
+                                        }
+                                    } catch (e) {
+                                        // Tidak perlu error handling khusus di sini
+                                    }
+                                });
+                            </script>
+                            <label>
+                                <input type="date" id="filterTglKunjungan" name="tgl_kunjungan" value="">
+                                <span>Filter Tanggal Kunjungan</span>
+                            </label>
+                            <script>
+                                // Tambahkan filter tanggal kunjungan ke permintaan API saat apply filter
+                                document.addEventListener('DOMContentLoaded', function () {
+                                    const applyFilterBtn = document.getElementById('applyFilter');
+                                    const clearFilterBtn = document.getElementById('clearFilter');
+                                    const filterPoli = document.getElementById('filterPoli');
+                                    const filterTglKunjungan = document.getElementById('filterTglKunjungan');
+                                    const searchInput = document.getElementById('searchInput');
+
+                                    // Simpan filter terakhir
+                                    let lastFilter = { poli: '', tgl: '' };
+
+                                    async function loadFilteredPendaftarans() {
+                                        let url = new URL(`${BASE_API_URL}/pendaftaran`);
+                                        url.searchParams.append('status', '3'); // status 3 = selesai
+
+                                        // Filter poli
+                                        if (filterPoli.value) {
+                                            url.searchParams.append('poli', filterPoli.value);
+                                        }
+                                        // Filter tanggal kunjungan
+                                        if (filterTglKunjungan.value) {
+                                            url.searchParams.append('tgl_kunjungan', filterTglKunjungan.value);
+                                        }
+                                        // Filter pencarian
+                                        if (searchInput.value.trim()) {
+                                            url.searchParams.append('search', searchInput.value.trim());
+                                        }
+
+                                        // Panggil ulang loadPendaftarans dengan query yang sudah difilter
+                                        // (Override fungsi loadPendaftarans agar menerima URL custom)
+                                        if (typeof window.loadPendaftarans === 'function') {
+                                            window.loadPendaftarans('', url);
+                                        }
+                                    }
+
+                                    // Override fungsi loadPendaftarans agar bisa menerima URL custom
+                                    const originalLoadPendaftarans = window.loadPendaftarans;
+                                    window.loadPendaftarans = function (searchQuery = '', customUrl = null) {
+                                        if (customUrl) {
+                                            // Salin isi originalLoadPendaftarans, tapi gunakan customUrl
+                                            (async function () {
+                                                loadingMessage.style.display = 'block';
+                                                errorMessage.style.display = 'none';
+                                                noDataMessage.style.display = 'none';
+                                                pendaftaranTableBody.innerHTML = '';
+                                                let url = customUrl;
+
+                                                try {
+                                                    const response = await fetch(url.toString(), {
+                                                        method: 'GET',
+                                                        headers: {
+                                                            'Accept': 'application/json',
+                                                            'Authorization': `Bearer ${authToken}`
+                                                        }
+                                                    });
+
+                                                    if (!response.ok) {
+                                                        const errorDetails = await response.json();
+                                                        throw new Error(errorDetails.message || `Gagal memuat data pendaftaran: ${response.statusText}`);
+                                                    }
+
+                                                    const result = await response.json();
+                                                    const pendaftarans = (result.data || []).filter(item =>
+                                                        String(item.status_raw) === '4' || (typeof item.status === 'string' && item.status.toLowerCase() === 'Selesai')
+                                                    );
+
+                                                    loadingMessage.style.display = 'none';
+
+                                                    if (pendaftarans.length === 0) {
+                                                        noDataMessage.style.display = 'block';
+                                                        paginationInfo.textContent = 'Total: 0';
+                                                        return;
+                                                    }
+
+                                                    pendaftarans.forEach((pendaftaran, index) => {
+                                                        const row = pendaftaranTableBody.insertRow();
+                                                        const statusClass = `status-${String(pendaftaran.status_raw || pendaftaran.status).toLowerCase().replace(/\s/g, '')}`;
+
+                                                        row.innerHTML = `
+                                                            <td>${index + 1}</td>
+                                                            <td>${pendaftaran.no_registrasi}</td>
+                                                            <td>${pendaftaran.nama_pasien || '-'}</td>
+                                                            <td>${pendaftaran.nik_pasien || '-'}</td>
+                                                            <td>${pendaftaran.nama_poli || '-'}</td>
+                                                            <td>${pendaftaran.nama_dokter || '-'}</td>
+                                                            <td>${pendaftaran.no_antrian}</td>
+                                                            <td class="${statusClass}">${pendaftaran.status}</td>
+                                                            <td class="aksi">
+                                                                <img src="image/eye.svg" alt="Detail" class="detail-btn" data-id="${pendaftaran.no_registrasi}">
+                                                            </td>
+                                                        `;
+                                                    });
+
+                                                    paginationInfo.textContent = `Total: ${pendaftarans.length}`;
+
+                                                    document.querySelectorAll('.detail-btn').forEach(button => {
+                                                        button.addEventListener('click', (event) => {
+                                                            const id = event.target.dataset.id;
+                                                            openDetailModal(id);
+                                                        });
+                                                    });
+
+                                                } catch (error) {
+                                                    loadingMessage.style.display = 'none';
+                                                    errorMessage.style.display = 'block';
+                                                    errorMessage.textContent = 'Gagal memuat data pendaftaran: ' + error.message;
+                                                    if (error.message.includes('Unauthenticated') || error.message.includes('token')) {
+                                                        localStorage.removeItem('auth_token');
+                                                        localStorage.removeItem('user_role');
+                                                        localStorage.removeItem('user_name');
+                                                        alert('Sesi Anda telah berakhir atau tidak valid. Silakan login kembali.');
+                                                        window.location.href = 'login.html';
+                                                    }
+                                                }
+                                            })();
+                                        } else {
+                                            originalLoadPendaftarans(searchQuery);
+                                        }
+                                    };
+
+                                    applyFilterBtn.addEventListener('click', function () {
+                                        loadFilteredPendaftarans();
+                                    });
+
+                                    clearFilterBtn.addEventListener('click', function () {
+                                        filterPoli.value = '';
+                                        filterTglKunjungan.value = '';
+                                        searchInput.value = '';
+                                        window.loadPendaftarans();
+                                    });
+                                });
+                            </script>
+                            <div class="button-group">
+                                <button id="applyFilter" type="button">Terapkan</button>
+                                <button id="clearFilter" type="button">Reset</button>
+                            </div>
+                        </div>
                 </div>
             </div>
             <div class="table-container">
