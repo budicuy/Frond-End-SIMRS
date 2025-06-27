@@ -478,7 +478,7 @@
                 const result = await response.json();
                 // Filter data agar hanya status yang BUKAN 3 DAN BUKAN "Selesai" yang ditampilkan
                 let pendaftarans = (result.data || []).filter(item =>
-                    String(item.status_raw) !== '3' && (typeof item.status !== 'string' || item.status.toLowerCase() !== 'selesai')
+                    String(item.status_raw) !== '4' && (typeof item.status !== 'string' || item.status.toLowerCase() !== 'Selesai')
                 );
 
                 loadingMessage.style.display = 'none';
